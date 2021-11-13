@@ -24,7 +24,7 @@ public class App extends JFrame implements ActionListener {
 
     /**
      * Creates an instance of the app with a menu bar and one panel inside.
-     * The menu bar contains options to reset workspace, load from existing and save current.
+     * The menu bar contains options to reset workspace, load from existing and save currfileent.
      *
      */
     public App() {
@@ -37,11 +37,51 @@ public class App extends JFrame implements ActionListener {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
 
+        JMenuBar menuBar1 = new JMenuBar();
+        JMenu connectionsMenu = new JMenu("Connections");
+
+        JMenuItem tspNN = new JMenuItem("TSP-Nearest Neighbor");
+        tspNN.addActionListener(this);
+        connectionsMenu.add(tspNN);
+
+        JMenuItem tspPro = new JMenuItem("TSP-Pro");
+        tspPro.addActionListener(this);
+        connectionsMenu.add(tspPro);
+
+        JMenuItem clusters = new JMenuItem("Clusters");
+        clusters.addActionListener(this);
+        connectionsMenu.add(clusters);
+
+        JMenuItem userConnect = new JMenuItem("User Connect");
+        userConnect.addActionListener(this);
+        connectionsMenu.add(userConnect);
+
+        ImageIcon moveIcon = new ImageIcon("icons/move.JPG");
+        ImageIcon connectIcon = new ImageIcon("icons/Connect.JPG");
+        ImageIcon createIcon = new ImageIcon("icons/create.JPG");
+
+        JMenu actionMenu = new JMenu("Action");
+
+        JMenuItem move = new JMenuItem("Move");
+        move.addActionListener(this);
+        actionMenu.add(move);
+
+        JMenuItem connect = new JMenuItem("Connect");
+        connect.addActionListener(this);
+        actionMenu.add(connect);
+
+        JMenuItem create = new JMenuItem("Create");
+        create.addActionListener(this);
+        actionMenu.add(create);
+
+
+
+
         JMenuItem newWorkspace = new JMenuItem("New/Reset");
         newWorkspace.addActionListener(this);
 
         fileMenu.add(newWorkspace);
-        JMenuItem openWorkspace = new JMenuItem("Open");
+        JMenuItem openWorkspace = new JMenuItem("Load");
         openWorkspace.addActionListener(this);
 
         fileMenu.add(openWorkspace);
@@ -50,6 +90,8 @@ public class App extends JFrame implements ActionListener {
 
         fileMenu.add(saveWorkspace);
         menuBar.add(fileMenu);
+        menuBar.add(connectionsMenu);
+        menuBar.add(actionMenu);
         menuBar.setVisible(true);
         add(menuBar, BorderLayout.NORTH);
 
