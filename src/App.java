@@ -62,15 +62,15 @@ public class App extends JFrame implements ActionListener {
 
         JMenu actionMenu = new JMenu("Action");
 
-        JMenuItem move = new JMenuItem("Move");
+        JMenuItem move = new JMenuItem("Move",moveIcon);
         move.addActionListener(this);
         actionMenu.add(move);
 
-        JMenuItem connect = new JMenuItem("Connect");
+        JMenuItem connect = new JMenuItem("Connect",connectIcon);
         connect.addActionListener(this);
         actionMenu.add(connect);
 
-        JMenuItem create = new JMenuItem("Create");
+        JMenuItem create = new JMenuItem("Create",createIcon);
         create.addActionListener(this);
         actionMenu.add(create);
 
