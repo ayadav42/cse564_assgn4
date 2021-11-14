@@ -101,8 +101,14 @@ public class App extends JFrame implements ActionListener {
 
         TSP tsp = new TSP();
         tsp.addObserver(workspace);
+
         Thread thread = new Thread(tsp); //Polling for resources, NIO.2
         thread.start();
+
+        BaseAlgorthim ba = new TSPAlgorithm();
+        ((TSPAlgorithm)ba).addObserver(workspace);
+        ((TSPAlgorithm)ba).setCities(Blackboard.getInstance().cityList);
+
 
     }
 
