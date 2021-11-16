@@ -149,25 +149,25 @@ public class App extends JFrame implements ActionListener {
                     saveCurrentWorkspace();
                     break;
                 case "TSP - nearest neighbor":
-                    tspnnWorkspace();
+                    workspace.tspnnWorkspace();
                     break;
                 case "TSP - pro":
-                    tspproWorkspace();
+                    workspace.tspproWorkspace();
                     break;
                 case "Clusters":
-                    clustersWorkspace();
+                    workspace.clustersWorkspace();
                     break;
                 case "User Connect":
-                    userconnectWorkspace();
+                    workspace.userconnectWorkspace();
                     break;
                 case "Move":
-                    moveWorkspace();
+                    workspace.moveWorkspace();
                     break;
                 case "Connect":
-                    connectWorkspace();
+                    workspace.connectWorkspace();
                     break;
                 case "Create":
-                    createWorkspace();
+                    workspace.createWorkspace();
                     break;
             }
         } catch (IOException fileNotFoundException) {
@@ -249,26 +249,7 @@ public class App extends JFrame implements ActionListener {
 
     }
 
-    private void clustersWorkspace() {
-    }
 
-    private void tspproWorkspace() {
-    }
-
-    private void tspnnWorkspace() {
-    }
-
-    private void userconnectWorkspace() {
-    }
-
-    private void moveWorkspace() {
-    }
-
-    private void connectWorkspace() {
-    }
-
-    private void createWorkspace() {
-    }
 
     public static class StatusBar extends JLabel {
 

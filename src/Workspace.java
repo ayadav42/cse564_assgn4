@@ -105,6 +105,27 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 
+    public void clustersWorkspace() {
+    }
+
+    public void tspproWorkspace() {
+    }
+
+    public void tspnnWorkspace() {
+    }
+
+    public void userconnectWorkspace() {
+    }
+
+    public void moveWorkspace() {
+    }
+
+    public void connectWorkspace() {
+    }
+
+    public void createWorkspace() {
+    }
+
     private City findCityAround(int x, int y) {
         for (City city : Blackboard.getInstance().cityList) if (city.bounds.contains(x, y)) return city;
         return null;
