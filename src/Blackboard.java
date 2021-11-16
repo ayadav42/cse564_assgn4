@@ -6,11 +6,8 @@ import java.util.List;
  * cities in the order of shortest traversal. It also maintains a flag
  * to mark change in city data.
  *
- * @author amaryadav
- * @author kaichen
- * @version 1.0
- * @since 2021-10-08
  */
+
 public class Blackboard {
 
     private static Blackboard _instance;
