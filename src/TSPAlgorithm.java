@@ -1,6 +1,4 @@
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Observable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -90,9 +88,28 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
                     System.out.print(n.name + " ");
                 }
         );
+
+        Blackboard.getInstance().path.clear();
+
+        int id =0;
+
+        //keep an eye
+        shortestRoute.cities.forEach(n -> {
+            Blackboard.getInstance().path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+        });
+
+            Map<City,City> m = new HashMap<>();
+            City prev = Blackboard.getInstance().path.get(0);
+
+
+            for (int i = 1; i < Blackboard.getInstance().path.size(); i++) {
+                m.put(prev,Blackboard.getInstance().path.get(i));
+                prev = Blackboard.getInstance().path.get(i);
+            }
+
         System.out.println("Notified obeservers");
         setChanged();
-        notifyObservers(shortestRoute.cities);
+        notifyObservers();
     }
 
     private TSPRoute createTspRoute(TSPRoute tspRoute) {

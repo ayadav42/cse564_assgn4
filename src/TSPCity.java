@@ -2,9 +2,9 @@
  * This class provides the city model on which the TSP algorithm needs to run
  */
 public class TSPCity {
-    private static final double EARTH_EQ_RAD = 6378.1370D;
-    private static final double DEG_TO_RAD = Math.PI/180D;
-    private static final double KM_TO_MILES = 0.621371;
+    public static final double EARTH_EQ_RAD = 6378.1370D;
+    public static final double DEG_TO_RAD = Math.PI/180D;
+    public static final double KM_TO_MILES = 0.621371;
 
     public double longitude;
     public double latitude;
