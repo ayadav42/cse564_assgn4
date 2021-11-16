@@ -89,11 +89,11 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
                 }
         );
 
-        Blackboard.getInstance().path.clear();
+        /*Blackboard.getInstance().path.clear();
 
         int id =0;
 
-        //keep an eye
+        //keep an eye, ma should be in the black board class
         shortestRoute.cities.forEach(n -> {
             Blackboard.getInstance().path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
         });
@@ -105,8 +105,12 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
             for (int i = 1; i < Blackboard.getInstance().path.size(); i++) {
                 m.put(prev,Blackboard.getInstance().path.get(i));
                 prev = Blackboard.getInstance().path.get(i);
-            }
-
+            }*/
+        List<City> path = new ArrayList<>();
+        shortestRoute.cities.forEach(n->{
+            path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+        });
+        Blackboard.getInstance().path=path;
         System.out.println("Notified obeservers");
         setChanged();
         notifyObservers();
