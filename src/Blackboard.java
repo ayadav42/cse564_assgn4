@@ -14,14 +14,14 @@ import java.util.List;
 public class Blackboard {
 
     private static Blackboard _instance;
-
+    
+    public Map<City, List<City>> path;
     public List<City> cityList;
-    public List<City> path;
     public boolean dataChanged;
 
     private Blackboard(){
         this.cityList = new ArrayList<>();
-        this.path = new ArrayList<>();
+        this.path = new HashMap<>();
 //        this.cityList.remove(this.cityList.size() - 1);
         dataChanged = true;
 
