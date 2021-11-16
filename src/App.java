@@ -1,3 +1,5 @@
+import com.sun.java.swing.ui.StatusBar;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -35,32 +37,81 @@ public class App extends JFrame implements ActionListener {
         setBounds(50, 50, width, height);
 
         JMenuBar menuBar = new JMenuBar();
+
+
+        //File
         JMenu fileMenu = new JMenu("File");
 
         JMenuItem newWorkspace = new JMenuItem("New/Reset");
         newWorkspace.addActionListener(this);
 
         fileMenu.add(newWorkspace);
+
         JMenuItem openWorkspace = new JMenuItem("Open");
         openWorkspace.addActionListener(this);
 
         fileMenu.add(openWorkspace);
+
         JMenuItem saveWorkspace = new JMenuItem("Save");
         saveWorkspace.addActionListener(this);
 
         fileMenu.add(saveWorkspace);
+
+        //Connections
+        JMenu connectionsMenu = new JMenu("Connections");
+
+        JMenuItem tspNNWorkspace = new JMenuItem("TSP - nearest neighbor");
+        tspNNWorkspace.addActionListener(this);
+        connectionsMenu.add(tspNNWorkspace);
+
+        JMenuItem tspProWorkspace = new JMenuItem("TSP - pro");
+        tspProWorkspace.addActionListener(this);
+        connectionsMenu.add(tspProWorkspace);
+
+        JMenuItem clusterWorkspace = new JMenuItem("Clusters");
+        clusterWorkspace.addActionListener(this);
+        connectionsMenu.add(clusterWorkspace);
+
+        JMenuItem userConnectWorkspace = new JMenuItem("User Connect");
+        userConnectWorkspace.addActionListener(this);
+        connectionsMenu.add(userConnectWorkspace);
+
+        //Action
+        JMenu actionMenu = new JMenu("Action");
+
+        JMenuItem moveWorkspace = new JMenuItem("Move");
+        moveWorkspace.addActionListener(this);
+        actionMenu.add(moveWorkspace);
+
+        JMenuItem connectWorkspace = new JMenuItem("Connect");
+        connectWorkspace.addActionListener(this);
+        actionMenu.add(connectWorkspace);
+
+        JMenuItem createWorkspace = new JMenuItem("Create");
+        createWorkspace.addActionListener(this);
+        actionMenu.add(createWorkspace);
+
         menuBar.add(fileMenu);
+        menuBar.add(connectionsMenu);
+        menuBar.add(actionMenu);
         menuBar.setVisible(true);
+
         add(menuBar, BorderLayout.NORTH);
 
         workspace = new Workspace(20, 20, 1560, 840, Color.WHITE);
         add(workspace, BorderLayout.CENTER);
         workspace.setVisible(true);
 
+        //Status Bar
+        StatusBar statBar = new StatusBar();
+        getContentPane().add(statBar, java.awt.BorderLayout.SOUTH);
+
         TSP tsp = new TSP();
+
         tsp.addObserver(workspace);
         Thread thread = new Thread(tsp); //Polling for resources, NIO.2
         thread.start();
+
 
     }
 
@@ -96,6 +147,27 @@ public class App extends JFrame implements ActionListener {
                     break;
                 case "Save":
                     saveCurrentWorkspace();
+                    break;
+                case "TSP - nearest neighbor":
+                    tspnnWorkspace();
+                    break;
+                case "TSP - pro":
+                    tspproWorkspace();
+                    break;
+                case "Clusters":
+                    clustersWorkspace();
+                    break;
+                case "User Connect":
+                    userconnectWorkspace();
+                    break;
+                case "Move":
+                    moveWorkspace();
+                    break;
+                case "Connect":
+                    connectWorkspace();
+                    break;
+                case "Create":
+                    createWorkspace();
                     break;
             }
         } catch (IOException fileNotFoundException) {
@@ -175,6 +247,41 @@ public class App extends JFrame implements ActionListener {
         myWriter.close();
         System.out.println("Successfully wrote to the file.");
 
+    }
+
+    private void clustersWorkspace() {
+    }
+
+    private void tspproWorkspace() {
+    }
+
+    private void tspnnWorkspace() {
+    }
+
+    private void userconnectWorkspace() {
+    }
+
+    private void moveWorkspace() {
+    }
+
+    private void connectWorkspace() {
+    }
+
+    private void createWorkspace() {
+    }
+
+    public static class StatusBar extends JLabel {
+
+        /** Creates a new instance of StatusBar */
+        public StatusBar() {
+            super();
+            super.setPreferredSize(new Dimension(100, 16));
+            setMessage("Status");
+        }
+
+        public void setMessage(String message) {
+            setText(" "+message);
+        }
     }
 
 }
