@@ -107,13 +107,13 @@ public class App extends JFrame implements ActionListener {
         Thread thread = new Thread(tsp); //Polling for resources, NIO.2
         thread.start();
 
-        BaseAlgorthim baseNN = new TSPAlgorithm();
-        ((TSPAlgorithm)baseNN).addObserver(workspace);
-        ((TSPAlgorithm)baseNN).setCities(Blackboard.getInstance().cityList);
+        BaseAlgorthim tspNeighbor = new TSPAlgorithm();
+        ((TSPAlgorithm)tspNeighbor).addObserver(workspace);
+        ((TSPAlgorithm)tspNeighbor).setCities(Blackboard.getInstance().cityList);
 
-        BaseAlgorthim baseCluster = new TSPCluster();
-        ((TSPCluster)baseCluster).addObserver(workspace);
-        ((TSPCluster)baseCluster).setCities(Blackboard.getInstance().cityList);
+        BaseAlgorthim tspCluster = new TSPCluster();
+        ((TSPCluster)tspCluster).addObserver(workspace);
+        ((TSPCluster)tspCluster).setCities(Blackboard.getInstance().cityList);
 
 
     }
