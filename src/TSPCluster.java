@@ -9,9 +9,8 @@ import java.util.stream.Collectors;
  * @author : Pritam De (ID: 1219491988, pritamde@asu.edu)
  */
 public class TSPCluster extends Observable implements BaseAlgorthim {
-    public static final double COOLING_RATE = 0.005;
-    public static final double TEMP_MIN = 0.99;
     public TSPRoute tspRoute;
+    public TSPRoute shortestRoute;
 
     /**
      * Initializes the cities on which the TSP need to run
@@ -68,10 +67,10 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
      */
     public void findRoute() {
         System.out.println("Find route called");
-        TSPRoute shortestRoute = createTspRoute(tspRoute);
+        shortestRoute = createTspRoute(tspRoute);
         TSPRoute adjacentRoute;
         int initialTemperature = 999;
-        while (initialTemperature > TEMP_MIN) {
+        while (initialTemperature > BaseAlgorthim.TEMP_MIN) {
             TSPRoute route = createTspRoute(tspRoute);
             adjacentRoute = obtainAdjacentRoute(route);
             if (tspRoute.getTotalDistance() < shortestRoute.getTotalDistance()) {
@@ -80,7 +79,7 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
             if (acceptRoute(tspRoute.getTotalDistance(), adjacentRoute.getTotalDistance(), initialTemperature)) {
                 tspRoute = createTspRoute(adjacentRoute);
             }
-            initialTemperature *= 1 - COOLING_RATE;
+            initialTemperature *= 1 - BaseAlgorthim.COOLING_RATE;
         }
 
         System.out.println("Printing the route");
@@ -88,7 +87,9 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
                     System.out.print(n.name + " ");
                 }
         );
-
+        computeCluster();
+    }
+    public void computeCluster(){
         HashMap<Integer,City> clusteredCity = new HashMap<>();
         shortestRoute.cities.forEach(n->{
             if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) < App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceHeight/2)){

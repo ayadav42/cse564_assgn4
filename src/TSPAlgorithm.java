@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  */
 public class TSPAlgorithm extends Observable implements BaseAlgorthim {
     public TSPRoute tspRoute;
+    public TSPRoute shortestRoute;
 
     /**
      * Initializes the cities on which the TSP need to run
@@ -66,7 +67,7 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
      */
     public void findRoute() {
         System.out.println("Find route called");
-        TSPRoute shortestRoute = createTspRoute(tspRoute);
+        shortestRoute = createTspRoute(tspRoute);
         TSPRoute adjacentRoute;
         int initialTemperature = 999;
         while (initialTemperature > BaseAlgorthim.TEMP_MIN) {
@@ -86,24 +87,9 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
                     System.out.print(n.name + " ");
                 }
         );
-
-        /*Blackboard.getInstance().path.clear();
-
-        int id =0;
-
-        //keep an eye, ma should be in the black board class
-        shortestRoute.cities.forEach(n -> {
-            Blackboard.getInstance().path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
-        });
-
-            Map<City,City> m = new HashMap<>();
-            City prev = Blackboard.getInstance().path.get(0);
-
-
-            for (int i = 1; i < Blackboard.getInstance().path.size(); i++) {
-                m.put(prev,Blackboard.getInstance().path.get(i));
-                prev = Blackboard.getInstance().path.get(i);
-            }*/
+        sendRoute();
+    }
+    public void sendRoute(){
         List<City> path = new ArrayList<>();
         shortestRoute.cities.forEach(n->{
             path.add(new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
