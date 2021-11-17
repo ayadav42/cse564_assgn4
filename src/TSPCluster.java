@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
  * @author : Ishanu Dhar (ID: 1222326326, idhar@asu.edu)
  * @author : Pritam De (ID: 1219491988, pritamde@asu.edu)
  */
-public class TSPAlgorithm extends Observable implements BaseAlgorthim {
+public class TSPCluster extends Observable implements BaseAlgorthim {
     public static final double COOLING_RATE = 0.005;
     public static final double TEMP_MIN = 0.99;
     public TSPRoute tspRoute;
@@ -106,12 +106,22 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
                 m.put(prev,Blackboard.getInstance().path.get(i));
                 prev = Blackboard.getInstance().path.get(i);
             }*/
-        List<City> path = new ArrayList<>();
-        shortestRoute.cities.forEach(n->{
-            path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
-        });
 
-        Blackboard.getInstance().path=path;
+        HashMap<Integer,City> clusteredCity = new HashMap<>();
+        shortestRoute.cities.forEach(n->{
+            if (((int)(n.latitude/TSPCity.DEG_TO_RAD) < 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) > 420)){
+                clusteredCity.put(1,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            }
+            else if (((int)(n.latitude/TSPCity.DEG_TO_RAD) > 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) > 420)){
+                clusteredCity.put(2,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            }
+
+            else if (((int)(n.latitude/TSPCity.DEG_TO_RAD) > 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) < 420)){
+                clusteredCity.put(3,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            }
+            else clusteredCity.put(4,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+        });
+        Blackboard.getInstance().clusteredCity=clusteredCity;
         System.out.println("Notified obeservers");
         setChanged();
         notifyObservers();

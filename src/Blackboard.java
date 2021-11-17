@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -17,11 +18,13 @@ public class Blackboard {
 
     public List<City> cityList;
     public List<City> path;
+    public HashMap<Integer,City> clusteredCity;
     public boolean dataChanged;
 
     private Blackboard(){
         this.cityList = new ArrayList<>();
         this.path = new ArrayList<>();
+        this.clusteredCity = new HashMap<>();
 //        this.cityList.remove(this.cityList.size() - 1);
         dataChanged = true;
 
