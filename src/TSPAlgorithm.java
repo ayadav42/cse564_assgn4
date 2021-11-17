@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
  * @author : Pritam De (ID: 1219491988, pritamde@asu.edu)
  */
 public class TSPAlgorithm extends Observable implements BaseAlgorthim {
-    public static final double COOLING_RATE = 0.005;
-    public static final double TEMP_MIN = 0.99;
     public TSPRoute tspRoute;
 
     /**
@@ -71,7 +69,7 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
         TSPRoute shortestRoute = createTspRoute(tspRoute);
         TSPRoute adjacentRoute;
         int initialTemperature = 999;
-        while (initialTemperature > TEMP_MIN) {
+        while (initialTemperature > BaseAlgorthim.TEMP_MIN) {
             TSPRoute route = createTspRoute(tspRoute);
             adjacentRoute = obtainAdjacentRoute(route);
             if (tspRoute.getTotalDistance() < shortestRoute.getTotalDistance()) {
@@ -80,7 +78,7 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
             if (acceptRoute(tspRoute.getTotalDistance(), adjacentRoute.getTotalDistance(), initialTemperature)) {
                 tspRoute = createTspRoute(adjacentRoute);
             }
-            initialTemperature *= 1 - COOLING_RATE;
+            initialTemperature *= 1 - BaseAlgorthim.COOLING_RATE;
         }
 
         System.out.println("Printing the route");
@@ -108,11 +106,11 @@ public class TSPAlgorithm extends Observable implements BaseAlgorthim {
             }*/
         List<City> path = new ArrayList<>();
         shortestRoute.cities.forEach(n->{
-            path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            path.add(new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
         });
 
         Blackboard.getInstance().path=path;
-        System.out.println("Notified obeservers");
+        System.out.println("Notified observers");
         setChanged();
         notifyObservers();
     }

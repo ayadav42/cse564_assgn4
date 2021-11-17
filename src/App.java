@@ -21,6 +21,8 @@ import java.util.ArrayList;
 public class App extends JFrame implements ActionListener {
 
     private final Workspace workspace;
+    public static final int workspaceWidth = 1560;
+    public static final int workspaceHeight = 840;
 
     /**
      * Creates an instance of the app with a menu bar and one panel inside.
@@ -95,7 +97,7 @@ public class App extends JFrame implements ActionListener {
         menuBar.setVisible(true);
         add(menuBar, BorderLayout.NORTH);
 
-        workspace = new Workspace(20, 20, 1560, 840, Color.WHITE);
+        workspace = new Workspace(20, 20, workspaceWidth, workspaceHeight, Color.WHITE);
         add(workspace, BorderLayout.CENTER);
         workspace.setVisible(true);
 
@@ -105,9 +107,13 @@ public class App extends JFrame implements ActionListener {
         Thread thread = new Thread(tsp); //Polling for resources, NIO.2
         thread.start();
 
-        BaseAlgorthim ba = new TSPAlgorithm();
-        ((TSPAlgorithm)ba).addObserver(workspace);
-        ((TSPAlgorithm)ba).setCities(Blackboard.getInstance().cityList);
+        BaseAlgorthim baseNN = new TSPAlgorithm();
+        ((TSPAlgorithm)baseNN).addObserver(workspace);
+        ((TSPAlgorithm)baseNN).setCities(Blackboard.getInstance().cityList);
+
+        BaseAlgorthim baseCluster = new TSPCluster();
+        ((TSPCluster)baseCluster).addObserver(workspace);
+        ((TSPCluster)baseCluster).setCities(Blackboard.getInstance().cityList);
 
 
     }

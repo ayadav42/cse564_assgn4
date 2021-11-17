@@ -2,10 +2,6 @@
  * This class provides the city model on which the TSP algorithm needs to run
  */
 public class TSPCity {
-    public static final double EARTH_EQ_RAD = 6378.1370D;
-    public static final double DEG_TO_RAD = Math.PI/180D;
-    public static final double KM_TO_MILES = 0.621371;
-
     public double longitude;
     public double latitude;
     public String name;
@@ -18,8 +14,8 @@ public class TSPCity {
      */
     public TSPCity(String name, double latitude, double longitude) {
         this.name=name;
-        this.longitude=longitude*DEG_TO_RAD;
-        this.latitude=latitude*DEG_TO_RAD;
+        this.longitude=longitude*BaseAlgorthim.DEG_TO_RAD;
+        this.latitude=latitude*BaseAlgorthim.DEG_TO_RAD;
     }
 
     /**
@@ -32,6 +28,6 @@ public class TSPCity {
         double delLatitude = (city.latitude - this.latitude);
         double a = Math.pow(Math.sin(delLatitude/2D), 2D) +
                 Math.cos(this.latitude)*Math.cos(city.latitude)*Math.pow(Math.sin(delLongitude/2D), 2D);
-        return KM_TO_MILES*EARTH_EQ_RAD*2D*Math.atan2(Math.sqrt(a), Math.sqrt(1D-a));
+        return BaseAlgorthim.KM_TO_MILES*BaseAlgorthim.EARTH_EQ_RAD*2D*Math.atan2(Math.sqrt(a), Math.sqrt(1D-a));
     }
 }

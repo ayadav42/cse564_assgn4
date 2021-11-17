@@ -89,37 +89,19 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
                 }
         );
 
-        /*Blackboard.getInstance().path.clear();
-
-        int id =0;
-
-        //keep an eye, ma should be in the black board class
-        shortestRoute.cities.forEach(n -> {
-            Blackboard.getInstance().path.add(new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
-        });
-
-            Map<City,City> m = new HashMap<>();
-            City prev = Blackboard.getInstance().path.get(0);
-
-
-            for (int i = 1; i < Blackboard.getInstance().path.size(); i++) {
-                m.put(prev,Blackboard.getInstance().path.get(i));
-                prev = Blackboard.getInstance().path.get(i);
-            }*/
-
         HashMap<Integer,City> clusteredCity = new HashMap<>();
         shortestRoute.cities.forEach(n->{
-            if (((int)(n.latitude/TSPCity.DEG_TO_RAD) < 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) > 420)){
-                clusteredCity.put(1,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) < App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceHeight/2)){
+                clusteredCity.put(1,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
             }
-            else if (((int)(n.latitude/TSPCity.DEG_TO_RAD) > 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) > 420)){
-                clusteredCity.put(2,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            else if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceHeight/2)){
+                clusteredCity.put(2,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
             }
 
-            else if (((int)(n.latitude/TSPCity.DEG_TO_RAD) > 800) && ((int)(n.longitude/TSPCity.DEG_TO_RAD) < 420)){
-                clusteredCity.put(3,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            else if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) < App.workspaceHeight/2)){
+                clusteredCity.put(3,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
             }
-            else clusteredCity.put(4,new City(n.name,(int)(n.latitude/TSPCity.DEG_TO_RAD),(int)(n.longitude/TSPCity.DEG_TO_RAD)));
+            else clusteredCity.put(4,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
         });
         Blackboard.getInstance().clusteredCity=clusteredCity;
         System.out.println("Notified obeservers");
