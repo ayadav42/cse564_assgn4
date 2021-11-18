@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class TSPCluster extends Observable implements BaseAlgorthim {
     public TSPRoute tspRoute;
     public TSPRoute shortestRoute;
+    public List<List<City>> path = new ArrayList<>(4);
+
 
     /**
      * Initializes the cities on which the TSP need to run
@@ -18,21 +20,34 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
      */
     public void setCities(List<City> cities) {
         if (cities != null) {
-            List<TSPCity> cityList = new LinkedList<>();
             int id =0;
+            List<List<TSPCity>> cityList = new ArrayList<>(4);
             cities.forEach(n -> {
-                cityList.add(new TSPCity(n.label + "", n.bounds.x, n.bounds.y));
-
+                if (n.bounds.x < App.workspaceWidth/2 && n.bounds.y > App.workspaceHeight/2){
+                    cityList.get(0).add(new TSPCity(n.label + "", n.bounds.x, n.bounds.y));
+                }
+                else if (n.bounds.x > App.workspaceWidth/2 && n.bounds.y > App.workspaceHeight/2){
+                    cityList.get(1).add(new TSPCity(n.label + "", n.bounds.x, n.bounds.y));
+                }
+                else if (n.bounds.x > App.workspaceWidth/2 && n.bounds.y < App.workspaceHeight/2){
+                    cityList.get(2).add(new TSPCity(n.label + "", n.bounds.x, n.bounds.y));
+                }
+                else {
+                    cityList.get(3).add(new TSPCity(n.label + "", n.bounds.x, n.bounds.y));
+                }
             });
-            tspRoute = new TSPRoute();
-            tspRoute.cities = new LinkedList<>();
-            tspRoute.cities.addAll(cityList);
-            if (cities.size() > 1) {
-                findRoute();
-            } else {
-                setChanged();
-                notifyObservers();
+            for (int i=0;i<cityList.size();i++){
+                tspRoute = new TSPRoute();
+                tspRoute.cities = new ArrayList<>();
+                tspRoute.cities.addAll(cityList.get(i));
+                if (cities.size()>1)
+                    findRoute(i);
+                else{
+                    setChanged();
+                    notifyObservers();
+                }
             }
+
         }
     }
 
@@ -65,7 +80,7 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
     /**
      * This method  calculates the TSP and fetches the shortest route
      */
-    public void findRoute() {
+    public void findRoute(int index) {
         System.out.println("Find route called");
         shortestRoute = createTspRoute(tspRoute);
         TSPRoute adjacentRoute;
@@ -81,30 +96,18 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
             }
             initialTemperature *= 1 - BaseAlgorthim.COOLING_RATE;
         }
-
         System.out.println("Printing the route");
         shortestRoute.cities.forEach(n -> {
                     System.out.print(n.name + " ");
                 }
         );
-        computeCluster();
+        computeCluster(index);
     }
-    public void computeCluster(){
-        HashMap<Integer,City> clusteredCity = new HashMap<>();
+    public void computeCluster(int clusterIndex){
         shortestRoute.cities.forEach(n->{
-            if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) < App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceHeight/2)){
-                clusteredCity.put(1,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
-            }
-            else if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceHeight/2)){
-                clusteredCity.put(2,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
-            }
-
-            else if (((int)(n.latitude/BaseAlgorthim.DEG_TO_RAD) > App.workspaceWidth/2) && ((int)(n.longitude/BaseAlgorthim.DEG_TO_RAD) < App.workspaceHeight/2)){
-                clusteredCity.put(3,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
-            }
-            else clusteredCity.put(4,new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
+            path.get(clusterIndex).add(new City(n.name,(int)(n.latitude/BaseAlgorthim.DEG_TO_RAD),(int)(n.longitude/BaseAlgorthim.DEG_TO_RAD)));
         });
-        Blackboard.getInstance().clusteredCity=clusteredCity;
+        Blackboard.getInstance().clusteredCity=path;
         System.out.println("Notified obeservers");
         setChanged();
         notifyObservers();
