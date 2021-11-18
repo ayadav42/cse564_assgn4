@@ -18,13 +18,13 @@ public class Blackboard {
 
     public List<City> cityList;
     public List<City> path;
-    public HashMap<Integer,City> clusteredCity;
+    public List<List<City>> clusteredCity;
     public boolean dataChanged;
 
     private Blackboard(){
         this.cityList = new ArrayList<>();
         this.path = new ArrayList<>();
-        this.clusteredCity = new HashMap<>();
+        this.clusteredCity = new ArrayList<>(4);
 //        this.cityList.remove(this.cityList.size() - 1);
         dataChanged = true;
 
