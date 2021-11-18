@@ -17,7 +17,7 @@ import java.util.Observable;
  * @version 1.0
  * @since 2021-10-08
  */
-public class TSP extends Observable implements Runnable {
+public class TSP extends Observable implements Runnable,BaseAlgorthim {
 
     public boolean keepRunning;
 
