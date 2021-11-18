@@ -1,4 +1,6 @@
+package controller.tsp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,6 +11,11 @@ import java.util.List;
 
 public class TSPRoute {
     public List<TSPCity> cities;
+
+    public TSPRoute(List<TSPCity> cities) {
+        this.cities = new ArrayList<>();
+        this.cities.addAll(cities);
+    }
 
     /**
      * gets the total distance between the cities

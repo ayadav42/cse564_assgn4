@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * This JPanel class is responsible for drawing the path between the cities
- * and track user's input to ensure latest data. It observes the controller.tsp.TSP to be
+ * and track user's input to ensure latest data. It observes the controller.tsp.TSPNearestNbr to be
  * notified when the path is ready.
  *
  * @author amaryadav
@@ -350,16 +350,16 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
     }
 
     /**
-     * This method is run when controller.tsp.TSP notifies that the path is ready
+     * This method is run when controller.tsp.TSPNearestNbr notifies that the path is ready
      * to be drawn.
      *
-     * @param o   The Observable controller.tsp.TSP object
+     * @param o   The Observable controller.tsp.TSPNearestNbr object
      * @param arg The arguments passed by it
      */
     @Override
     public void update(Observable o, Object arg) {
 
-        System.out.println("notified by controller.tsp.TSP, proceeding to repaint");
+        System.out.println("notified by controller.tsp.TSPAlgorithm, proceeding to repaint");
         repaint();
 
     }

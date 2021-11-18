@@ -5,7 +5,6 @@ import model.City;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 /**
  * This class is responsible for calculating the shortest hamiltonian path
@@ -17,20 +16,21 @@ import java.util.Observable;
  * @version 1.0
  * @since 2021-10-08
  */
-public class TSP extends Observable implements Runnable,BaseAlgorthim {
+public class TSPNearestNbr extends TSPAlgorithm {
 
-    public boolean keepRunning;
+    public static final String name = "TSP - Nearest Neighbor";
 
     /**
-     * Creates an instance of controller.tsp.TSP class initialized
+     * Creates an instance of controller.tsp.TSPNearestNbr class initialized
      * to keep running when requested.
-     *
      */
-    public TSP() {
+    public TSPNearestNbr() {
+        super(TSPTypes.TSP_NEAREST_NBR);
         this.keepRunning = true;
     }
 
-    private void calculate(List<City> cityList) { //reorder the cities
+    @Override
+    public void calculate(List<City> cityList) { //reorder the cities
 
         List<List<City>> path = new ArrayList<>();
 
@@ -56,19 +56,18 @@ public class TSP extends Observable implements Runnable,BaseAlgorthim {
             }
         }
 
-
         List<City> connections = new ArrayList<>();
         connections.add(cityList.get(0));
         visitedCount++;
         visited[0] = true;
         int prevCityIndex = 0;
 
-        while(visitedCount != cityList.size()){
+        while (visitedCount != cityList.size()) {
             //find next unvisited closest nbr
             int closestNbrIndex = -1;
             int minDistance = Integer.MAX_VALUE;
-            for(int i = 0; i < cityList.size(); i++){
-                if(!visited[i] && distance[prevCityIndex][i] < minDistance){
+            for (int i = 0; i < cityList.size(); i++) {
+                if (!visited[i] && distance[prevCityIndex][i] < minDistance) {
                     minDistance = distance[prevCityIndex][i];
                     closestNbrIndex = i;
                 }
@@ -86,26 +85,4 @@ public class TSP extends Observable implements Runnable,BaseAlgorthim {
 
     }
 
-    /**
-     * This method helps controller.tsp.TSP scan for data changes in the list of cities
-     * and calculate the new path if needed.
-     *
-     */
-    @Override
-    public void run() {
-
-        while (this.keepRunning) {
-            try {
-                Thread.sleep(1); //without this code won't work, need to ask prof. why
-                if (Blackboard.getInstance().dataChanged) {
-                    System.out.println("dataChanged=" + Blackboard.getInstance().dataChanged);
-                    this.calculate(Blackboard.getInstance().cityList);
-                    Blackboard.getInstance().dataChanged = false;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 }

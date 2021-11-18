@@ -5,8 +5,8 @@ import java.awt.*;
 public class Circle extends ShapeComponent {
 
     final int diameter;
-    int x;
-    int y;
+    int x_corner;
+    int y_corner;
 
     public Circle(int x, int y, int size, Color color) {
 
@@ -19,25 +19,27 @@ public class Circle extends ShapeComponent {
     @Override
     public void moveTo(int x, int y) {
 
-        this.x = x + 4;
-        this.y = y + 4;
+        this.x_corner = x + 4;
+        this.y_corner = y + 4;
 
     }
 
     @Override
     public boolean containsPoint(int x, int y) {
 
-        int x_center = x + diameter / 2;
-        int y_center = y + diameter / 2;
+        double radius = diameter / 2.0;
+        int x_center = x_corner + (int) radius;
+        int y_center = y_corner + (int) radius;
 
         double distanceFromCenter = Math.sqrt(
                 (Math.pow((x - x_center), 2) + Math.pow((y - y_center), 2))
         );
 
-        double radius = diameter / 2.0;
         System.out.print("checking for inside circle with bounds x=" + x + ", y=" + y + ", x_center=" + x_center + ", y_center=" + y_center + ", radius=" + radius + ", distanceFromCenter=" + distanceFromCenter);
         if (distanceFromCenter <= radius) {
             System.out.println("  :  yes\n");
+        }else{
+            System.out.println("  :  no\n");
         }
 
         return distanceFromCenter <= radius;
@@ -47,7 +49,7 @@ public class Circle extends ShapeComponent {
     public void draw(Graphics g) {
 
         g.setColor(this.color);
-        g.fillOval(x, y, diameter, diameter);
+        g.fillOval(x_corner, y_corner, diameter, diameter);
 
     }
 
