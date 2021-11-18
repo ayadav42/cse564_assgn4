@@ -1,3 +1,8 @@
+package view;
+
+import model.City;
+import controller.tsp.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,6 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * This class orchestrates various classes and functions to calculate the shortest hamiltonian path
@@ -20,12 +26,14 @@ import java.util.ArrayList;
  */
 public class App extends JFrame implements ActionListener {
 
+    public static final int workspaceWidth = 1560;
+    public static final int workspaceHeight = 840;
     private final Workspace workspace;
+//    private TSP controller.tsp; //TODO
 
     /**
      * Creates an instance of the app with a menu bar and one panel inside.
      * The menu bar contains options to reset workspace, load from existing and save current.
-     *
      */
     public App() {
 
@@ -53,7 +61,7 @@ public class App extends JFrame implements ActionListener {
         menuBar.setVisible(true);
         add(menuBar, BorderLayout.NORTH);
 
-        workspace = new Workspace(20, 20, 1560, 840, Color.WHITE);
+        workspace = new Workspace(20, 20, workspaceWidth, workspaceHeight, Color.WHITE);
         add(workspace, BorderLayout.CENTER);
         workspace.setVisible(true);
 
@@ -65,7 +73,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     /**
-     * This main method creates an instance of App and display the app.
+     * This main method creates an instance of gui.view.App and display the app.
      *
      * @param args The command line arguments
      */
@@ -133,7 +141,7 @@ public class App extends JFrame implements ActionListener {
         if (filepath.isEmpty()) {
             showDialog("No file selected, please select a file to continue.");
             return;
-        } else if (!filepath.contains(".txt")) {
+        } else if (!filepath.contains(".txt"))  {
             showDialog("Please select a .txt file to continue.");
             return;
         }
@@ -144,10 +152,34 @@ public class App extends JFrame implements ActionListener {
         String line = br.readLine();
 
         while (line != null) {
+
             String[] arr = line.split(",");
-            City newCity = new City(arr[0], Integer.parseInt(arr[1]), Integer.parseInt(arr[2]));
+            System.out.println("city arr: " + Arrays.toString(arr));
+            String cityName = arr[0];
+            int x = Integer.parseInt(arr[1]);
+            int y = Integer.parseInt(arr[2]);
+            String size = arr[3];
+
+            boolean[] shapes = {false, false, false};
+            Color[] colors = {null, null, null};
+            if(arr[4] != null && !arr[4].isEmpty() && !arr[4].equals("$")){
+                shapes[0] = true;
+                colors[0] = new Color(Integer.parseInt(arr[4]));
+            }
+            if(arr[5] != null && !arr[5].isEmpty() && !arr[5].equals("$")){
+                shapes[1] = true;
+                colors[1] = new Color(Integer.parseInt(arr[5]));
+            }
+            if(arr[6] != null && !arr[6].isEmpty() && !arr[6].equals("$")){
+                shapes[2] = true;
+                colors[2] = new Color(Integer.parseInt(arr[6]));
+            }
+
+            City newCity = this.workspace.createNewCityFromInput(x, y, cityName, size, shapes, colors);
             cities.add(newCity);
+
             line = br.readLine();
+
         }
 
         br.close();
@@ -162,7 +194,7 @@ public class App extends JFrame implements ActionListener {
         String filename = (String) JOptionPane.showInputDialog(
                 this,
                 "Enter a name for this workspace.",
-                "Save Workspace",
+                "Save gui.Workspace",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,

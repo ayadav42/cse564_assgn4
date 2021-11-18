@@ -1,3 +1,7 @@
+package model;
+
+import model.cityshapes.ShapeComponent;
+
 import java.awt.*;
 
 /**
@@ -10,22 +14,24 @@ import java.awt.*;
  */
 public class City {
 
-    public static final int width = 100;
-    public static final int height = 50;
-    String label;
-    Rectangle bounds;
+    public static final int minSize = 30;
+    public static final int maxSize = 80;
+    public Rectangle bounds;
+    public String label;
+    ShapeComponent cityShape;
 
     /**
-     * Creates an instance of City
+     * Creates an instance of model.City
      *
-     * @param label  The city's name set by user
-     * @param x  The city's x-coordinate
-     * @param y  The city's y-coordinate
+     * @param label The city's name set by user
+     * @param x     The city's x-coordinate
+     * @param y     The city's y-coordinate
      */
-    public City(String label, int x, int y) {
+    public City(String label, int x, int y, ShapeComponent cityShape, int size) {
 
         this.label = label;
-        this.bounds = new Rectangle(x, y, width, height);
+        this.bounds = new Rectangle(x, y, size, size);
+        this.cityShape = cityShape;
 
     }
 
@@ -36,13 +42,16 @@ public class City {
      */
     public void draw(Graphics g) {
 
-        int x = bounds.x, y = bounds.y, h = bounds.height, w = bounds.width;
-        g.drawRect(x, y, w, h);
         Color c = g.getColor();
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(x + 1, y + 1, w - 1, h - 1);
-        g.setColor(Color.red);
-        if (!label.isEmpty()) g.drawString(label, center().x - 15, center().y + 5);
+
+        cityShape.draw(g);
+
+        if (!label.isEmpty()) {
+            Color textColor = Color.BLACK;
+            g.setColor(textColor);
+            g.drawString(label, center().x - 15, center().y + 5);
+        }
+
         g.setColor(c);
 
     }
@@ -50,23 +59,28 @@ public class City {
     /**
      * This method is used to move city to new co-ordinates.
      *
-     * @param x  The city's new x-coordinate
-     * @param y  The city's new y-coordinate
+     * @param x The city's new x-coordinate
+     * @param y The city's new y-coordinate
      */
     public void move(int x, int y) {
         bounds.x = x;
         bounds.y = y;
+        cityShape.moveTo(x, y);
     }
 
     private Point center() {
         return new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     }
 
+    public boolean containsPoint(int x, int y) {
+        return this.cityShape.containsPoint(x, y);
+    }
+
     /**
      * This method is used to draw connection between two cities.
      *
-     * @param other  The other city
-     * @param g2D  The Graphics2D instance
+     * @param other The other city
+     * @param g2D   The Graphics2D instance
      */
     public void drawConnection(City other, Graphics2D g2D) {
         g2D.drawLine(center().x, center().y, other.center().x, other.center().y);
@@ -80,7 +94,7 @@ public class City {
     @Override
     public String toString() {
 
-        return "City{" +
+        return "model.City{" +
                 "label=" + label +
                 ", x=" + bounds.x +
                 ", y=" + bounds.y +
@@ -94,6 +108,12 @@ public class City {
      * @return String Contains city's name and location.
      */
     public String toStorageFormat() {
-        return this.label + "," + this.bounds.x + "," + this.bounds.y;
+
+        String[] shapes = {"$", "$", "$"};
+        this.cityShape.toStorageFormat(shapes);
+
+        return this.label + "," + this.bounds.x + "," + this.bounds.y + "," + this.bounds.width + "," + String.join(",", shapes) + ",";
+
     }
+
 }
