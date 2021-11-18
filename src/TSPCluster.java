@@ -20,7 +20,6 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
      */
     public void setCities(List<City> cities) {
         if (cities != null) {
-            int id =0;
             List<List<TSPCity>> cityList = new ArrayList<>(4);
             cities.forEach(n -> {
                 if (n.bounds.x < App.workspaceWidth/2 && n.bounds.y > App.workspaceHeight/2){
@@ -47,7 +46,6 @@ public class TSPCluster extends Observable implements BaseAlgorthim {
                     notifyObservers();
                 }
             }
-
         }
     }
 
