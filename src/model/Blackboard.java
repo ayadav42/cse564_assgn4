@@ -1,3 +1,5 @@
+package model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,15 +16,15 @@ import java.util.List;
 public class Blackboard {
 
     private static Blackboard _instance;
-    
-    public Map<City, List<City>> path;
+
     public List<City> cityList;
+    public List<List<City>> path;
     public boolean dataChanged;
 
     private Blackboard(){
+
         this.cityList = new ArrayList<>();
-        this.path = new HashMap<>();
-//        this.cityList.remove(this.cityList.size() - 1);
+        this.path = new ArrayList<>();
         dataChanged = true;
 
     }

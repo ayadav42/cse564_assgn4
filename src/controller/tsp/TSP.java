@@ -1,3 +1,8 @@
+package controller.tsp;
+
+import model.Blackboard;
+import model.City;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -17,7 +22,7 @@ public class TSP extends Observable implements Runnable {
     public boolean keepRunning;
 
     /**
-     * Creates an instance of TSP class initialized
+     * Creates an instance of controller.tsp.TSP class initialized
      * to keep running when requested.
      *
      */
@@ -27,7 +32,7 @@ public class TSP extends Observable implements Runnable {
 
     private void calculate(List<City> cityList) { //reorder the cities
 
-        List<City> path = new ArrayList<>();
+        List<List<City>> path = new ArrayList<>();
 
         if (cityList.isEmpty()) {
             Blackboard.getInstance().path = path;
@@ -52,7 +57,8 @@ public class TSP extends Observable implements Runnable {
         }
 
 
-        path.add(cityList.get(0));
+        List<City> connections = new ArrayList<>();
+        connections.add(cityList.get(0));
         visitedCount++;
         visited[0] = true;
         int prevCityIndex = 0;
@@ -68,11 +74,12 @@ public class TSP extends Observable implements Runnable {
                 }
             }
 
-            path.add(cityList.get(closestNbrIndex));
+            connections.add(cityList.get(closestNbrIndex));
             visitedCount++;
             visited[closestNbrIndex] = true;
         }
 
+        path.add(connections);
         Blackboard.getInstance().path = path;
         setChanged();
         notifyObservers();
@@ -80,7 +87,7 @@ public class TSP extends Observable implements Runnable {
     }
 
     /**
-     * This method helps TSP scan for data changes in the list of cities
+     * This method helps controller.tsp.TSP scan for data changes in the list of cities
      * and calculate the new path if needed.
      *
      */
