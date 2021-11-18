@@ -49,6 +49,7 @@ public class TSPCluster extends TSPAlgorithm {
         tspClusterList.add(new ArrayList<>());
 
         cityList.forEach(city -> {
+            System.out.println("city="+city);
             if (city.bounds.x < App.workspaceWidth / 2 && city.bounds.y > App.workspaceHeight / 2) {
                 tspClusterList.get(0).add(new TSPCity(city, city.bounds.x, city.bounds.y));
             } else if (city.bounds.x > App.workspaceWidth / 2 && city.bounds.y > App.workspaceHeight / 2) {

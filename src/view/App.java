@@ -1,5 +1,6 @@
 package view;
 
+import model.Blackboard;
 import model.City;
 import controller.tsp.*;
 
@@ -12,6 +13,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 
 /**
@@ -29,6 +31,8 @@ public class App extends JFrame implements ActionListener {
     public static final int workspaceWidth = 1560;
     public static final int workspaceHeight = 840;
     private final Workspace workspace;
+    private final JMenu connectionsMenu;
+    private final JMenu actionMenu;
     private TSPAlgorithm tspAlgorithm;
     private Thread tspThread;
 
@@ -59,7 +63,7 @@ public class App extends JFrame implements ActionListener {
         saveWorkspace.addActionListener(this);
         fileMenu.add(saveWorkspace);
 
-        JMenu connectionsMenu = new JMenu("Connections");
+        connectionsMenu = new JMenu("Connections");
 
         JMenuItem tspNN = new JMenuItem(TSPNearestNbr.name);
         tspNN.addActionListener(this);
@@ -73,7 +77,7 @@ public class App extends JFrame implements ActionListener {
         clusters.addActionListener(this);
         connectionsMenu.add(clusters);
 
-        JMenuItem userConnect = new JMenuItem("User Connect");
+        JMenuItem userConnect = new JMenuItem(TSPUserConnect.name);
         userConnect.addActionListener(this);
         connectionsMenu.add(userConnect);
 
@@ -81,7 +85,7 @@ public class App extends JFrame implements ActionListener {
         ImageIcon connectIcon = new ImageIcon("icons/Connect.JPG");
         ImageIcon createIcon = new ImageIcon("icons/create.JPG");
 
-        JMenu actionMenu = new JMenu("Action");
+        actionMenu = new JMenu("Action");
 
         JMenuItem move = new JMenuItem("Move", moveIcon);
         move.addActionListener(this);
@@ -97,6 +101,7 @@ public class App extends JFrame implements ActionListener {
 
         menuBar.add(fileMenu);
         menuBar.add(connectionsMenu);
+        actionMenu.setEnabled(false);
         menuBar.add(actionMenu);
         menuBar.setVisible(true);
         add(menuBar, BorderLayout.NORTH);
@@ -121,35 +126,8 @@ public class App extends JFrame implements ActionListener {
 
     }
 
-    private void setTspAlgorithm(String name) {
+    private String getTspName(TSPTypes type) {
 
-        TSPAlgorithm tspAlgorithm;
-
-        switch (name) {
-            case TSPNearestNbr.name:
-                tspAlgorithm = new TSPNearestNbr();
-                break;
-            case TSPPro.name:
-                tspAlgorithm = new TSPPro();
-                break;
-            case TSPCluster.name:
-                System.out.println("setTspAlgo : TSP - Cluster");
-                tspAlgorithm = new TSPCluster();
-                break;
-            case "User Connect":
-                tspAlgorithm = null;
-                break;
-            default:
-                tspAlgorithm = new TSPNearestNbr();
-        }
-
-        setTspAlgorithm(tspAlgorithm);
-
-    }
-
-    private String getTspName(TSPAlgorithm tspAlgorithm) {
-
-        TSPTypes type = tspAlgorithm.type;
         String retVal;
 
         switch (type) {
@@ -162,11 +140,8 @@ public class App extends JFrame implements ActionListener {
             case TSP_CLUSTER:
                 retVal = TSPCluster.name;
                 break;
-            case USER_CONNECT:
-                retVal = "User Connect";
-                break;
             default:
-                retVal = TSPNearestNbr.name;
+                retVal = TSPUserConnect.name;
                 break;
         }
 
@@ -174,16 +149,96 @@ public class App extends JFrame implements ActionListener {
 
     }
 
+    private String getTspName(TSPAlgorithm tspAlgorithm) {
+
+        TSPTypes type = tspAlgorithm.type;
+        return getTspName(type);
+
+    }
+
+    private void setTspAlgorithm(String name) {
+
+        TSPAlgorithm tspAlgorithm;
+
+        switch (name) {
+            case TSPNearestNbr.name:
+                tspAlgorithm = new TSPNearestNbr();
+                break;
+            case TSPPro.name:
+                tspAlgorithm = new TSPPro();
+                break;
+            case TSPCluster.name:
+                tspAlgorithm = new TSPCluster();
+                break;
+            default:
+                tspAlgorithm = new TSPUserConnect();
+        }
+
+        System.out.println("Setting tspAlgorithm=" + name + ", type=" + tspAlgorithm.type);
+        setTspAlgorithm(tspAlgorithm);
+
+    }
+
     private void setTspAlgorithm(TSPAlgorithm tspAlgorithm) {
 
-        if (this.tspThread != null && !this.tspThread.isInterrupted()) this.tspThread.interrupt();
-        this.tspAlgorithm = tspAlgorithm;
+        if (this.tspThread != null && !this.tspThread.isInterrupted()) {
+            System.out.println("stopping this.tspThread");
+            this.tspThread.stop();
+        }
 
         if (this.tspAlgorithm != null) {
-            this.tspAlgorithm.addObserver(workspace);
-            this.tspThread = new Thread(tspAlgorithm); //Polling for resources, NIO.2
-            this.tspThread.start();
+            System.out.println("this.tspAlgorithm not null=" + getTspName(this.tspAlgorithm));
+            this.tspAlgorithm.deleteObserver(this.workspace);
         }
+
+        this.tspAlgorithm = tspAlgorithm; //null in case of "User Connect"
+        System.out.println("setting new this.tspAlgorithm type=" + this.tspAlgorithm.type + ", name=" + getTspName(this.tspAlgorithm));
+        this.tspAlgorithm.addObserver(workspace);
+        this.tspThread = new Thread(tspAlgorithm); //Polling for resources, NIO.2
+        this.tspThread.start();
+        Blackboard.getInstance().dataChanged = true;
+
+        if (this.tspAlgorithm.type == TSPTypes.USER_CONNECT) {
+
+            if (this.actionMenu.isEnabled()) {
+                System.out.println("action menu was enabled, disabling action menu and enabling connections menu");
+                disableUserConnect();
+                enableTSPConnectionMenuItems();
+
+            } else {
+                System.out.println("action menu was disabled, enabling action menu and disabling connections menu");
+                enableUserConnect();
+                disableTSPConnectionMenuItems();
+
+            }
+        }
+
+    }
+
+    public void enableTSPConnectionMenuItems() {
+        for (Component connectionMenuItem : this.connectionsMenu.getMenuComponents()) {
+            connectionMenuItem.setEnabled(true);
+        }
+    }
+
+    public void disableTSPConnectionMenuItems() {
+        for (Component connectionMenuItem : this.connectionsMenu.getMenuComponents()) {
+            connectionMenuItem.setEnabled(false);
+        }
+        this.connectionsMenu.getMenuComponent(3).setEnabled(true);
+    }
+
+    public void enableUserConnect() {
+
+        this.workspace.enableUserConnect();
+        this.actionMenu.setEnabled(true);
+
+    }
+
+    public void disableUserConnect() {
+
+        this.workspace.disableUserConnect();
+        this.actionMenu.setEnabled(false);
 
     }
 
@@ -200,6 +255,7 @@ public class App extends JFrame implements ActionListener {
         try {
             switch (item.getText()) {
                 case "New/Reset":
+                    Blackboard.getInstance().path = new ArrayList<>();
                     workspace.resetCityList();
                     break;
                 case "Open":
@@ -207,6 +263,29 @@ public class App extends JFrame implements ActionListener {
                     break;
                 case "Save":
                     saveCurrentWorkspace();
+                    break;
+
+                case TSPNearestNbr.name:
+                    setTspAlgorithm(TSPNearestNbr.name);
+                    break;
+                case TSPPro.name:
+                    setTspAlgorithm(TSPPro.name);
+                    break;
+                case TSPCluster.name:
+                    setTspAlgorithm(TSPCluster.name);
+                    break;
+                case TSPUserConnect.name:
+                    setTspAlgorithm(TSPUserConnect.name);
+                    break;
+
+                case "Move":
+                    this.workspace.enableMove();
+                    break;
+                case "Connect":
+                    this.workspace.enableConnect();
+                    break;
+                case "Create":
+                    this.workspace.enableCreateNewCity();
                     break;
             }
         } catch (IOException fileNotFoundException) {
@@ -249,48 +328,69 @@ public class App extends JFrame implements ActionListener {
             return;
         }
 
-        ArrayList<City> cities = new ArrayList<>();
+        List<City> cities = new ArrayList<>();
+        List<List<City>> path = new ArrayList<>();
         System.out.println("reading txt file: " + filepath);
         BufferedReader br = new BufferedReader(new FileReader(filepath));
-        String line = br.readLine(); //first line contains the algo
-        setTspAlgorithm(line);
-        line = br.readLine();
+
+        String tspAlgo = br.readLine(); //first line contains the algo
+
+        int noOfCities = 0;
+        String line = br.readLine();
 
         while (line != null) {
 
-            String[] arr = line.split(",");
-            System.out.println("city arr: " + Arrays.toString(arr));
-            String cityName = arr[0];
-            int x = Integer.parseInt(arr[1]);
-            int y = Integer.parseInt(arr[2]);
-            String size = arr[3];
+            List<City> cluster = new ArrayList<>();
 
-            boolean[] shapes = {false, false, false};
-            Color[] colors = {null, null, null};
-            if (arr[4] != null && !arr[4].isEmpty() && !arr[4].equals("$")) {
-                shapes[0] = true;
-                colors[0] = new Color(Integer.parseInt(arr[4]));
-            }
-            if (arr[5] != null && !arr[5].isEmpty() && !arr[5].equals("$")) {
-                shapes[1] = true;
-                colors[1] = new Color(Integer.parseInt(arr[5]));
-            }
-            if (arr[6] != null && !arr[6].isEmpty() && !arr[6].equals("$")) {
-                shapes[2] = true;
-                colors[2] = new Color(Integer.parseInt(arr[6]));
+            while (!line.equals("$$")) {
+                String[] arr = line.split(",");
+                System.out.println("city arr: " + Arrays.toString(arr));
+                String cityName = arr[0];
+                int x = Integer.parseInt(arr[1]);
+                int y = Integer.parseInt(arr[2]);
+                String size = arr[3];
+
+                boolean[] shapes = {false, false, false};
+                Color[] colors = {null, null, null};
+                if (arr[4] != null && !arr[4].isEmpty() && !arr[4].equals("$")) {
+                    shapes[0] = true;
+                    colors[0] = new Color(Integer.parseInt(arr[4]));
+                }
+                if (arr[5] != null && !arr[5].isEmpty() && !arr[5].equals("$")) {
+                    shapes[1] = true;
+                    colors[1] = new Color(Integer.parseInt(arr[5]));
+                }
+                if (arr[6] != null && !arr[6].isEmpty() && !arr[6].equals("$")) {
+                    shapes[2] = true;
+                    colors[2] = new Color(Integer.parseInt(arr[6]));
+                }
+
+                City newCity = this.workspace.createNewCityFromInput(x, y, cityName, size, shapes, colors);
+                System.out.println("newCity="+newCity);
+                cities.add(newCity);
+                cluster.add(newCity);
+                noOfCities++;
+
+                line = br.readLine();
             }
 
-            City newCity = this.workspace.createNewCityFromInput(x, y, cityName, size, shapes, colors);
-            cities.add(newCity);
+            System.out.println("cluster read: "+cluster);
+            path.add(cluster);
 
             line = br.readLine();
-
         }
 
         br.close();
-        System.out.println("Read file with " + cities.size() + " cities.");
+        System.out.println("\nRead file with " + noOfCities + " cities. Path=");
+        for(List<City> cluster : path){
+            System.out.println("cluster="+cluster);
+        }
 
+        Blackboard.getInstance().path = path;
         workspace.updateCityList(cities);
+        Blackboard.getInstance().printCities();
+        Blackboard.getInstance().printClusters();
+        setTspAlgorithm(tspAlgo);
 
     }
 

@@ -24,6 +24,10 @@ import java.util.List;
 public class Workspace extends JPanel implements Observer, MouseListener, MouseMotionListener {
 
     private City selectedCity;
+    private boolean userConnect;
+    private boolean canMoveCities;
+    private boolean canConnectCities;
+    private boolean canCreateCities;
 
     /**
      * Creates an instance of graph with customised bounds and background color.
@@ -38,6 +42,8 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     public Workspace(int x, int y, int width, int height, Color color) {
 
+        disableUserConnect();
+        resetFlags();
         setName("WorkspaceJPanel");
         setBounds(x, y, width, height);
         setBackground(color);
@@ -45,6 +51,45 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         addMouseMotionListener(this);
         resetCityList();
 
+    }
+
+    public void resetFlags() {
+
+        this.canMoveCities = false;
+        this.canConnectCities = false;
+        this.canCreateCities = false;
+
+    }
+
+    public void enableUserConnect() {
+        this.userConnect = true;
+        resetFlags();
+        enableCreateNewCity();
+    }
+
+    public void disableUserConnect() {
+        this.userConnect = false;
+    }
+
+    public void enableMove() {
+        System.out.println("moving cities enabled");
+        this.canMoveCities = true;
+        this.canConnectCities = false;
+        this.canCreateCities = false;
+    }
+
+    public void enableConnect() {
+        System.out.println("connecting cities enabled");
+        this.canMoveCities = false;
+        this.canConnectCities = true;
+        this.canCreateCities = false;
+    }
+
+    public void enableCreateNewCity() {
+        System.out.println("creating cities enabled");
+        this.canMoveCities = false;
+        this.canConnectCities = false;
+        this.canCreateCities = true;
     }
 
     /**
@@ -72,11 +117,18 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     public String getCitiesInTxtFriendlyFormat() {
 
-        String[] cities = new String[Blackboard.getInstance().cityList.size()];
+        String[] cities = new String[Blackboard.getInstance().cityList.size() + Blackboard.getInstance().path.size()];
+        System.out.println("getCitiesInTxtFriendlyFormat cities.size=" + cities.length);
         int index = 0;
 
-        for (City city : Blackboard.getInstance().cityList) {
-            cities[index++] = city.toStorageFormat();
+        for (List<City> cluster : Blackboard.getInstance().path) {
+            for (City city : cluster) {
+                cities[index++] = city.toStorageFormat();
+            }
+            if (index < cities.length) {
+                cities[index] = "$$";
+                index++;
+            }
         }
 
         return String.join("\n", cities);
@@ -94,60 +146,19 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         Graphics2D g2D = (Graphics2D) g;
         g2D.setColor(Color.BLUE);
 
-        for (List<City> cityList : Blackboard.getInstance().path) {
-            System.out.println("painting cities=" + cityList.size());
+        for (List<City> cluster : Blackboard.getInstance().path) {
+            System.out.println("painting cities=" + cluster.size());
             City prev = null;
 
-            for (City city : cityList) {
-                if (prev != null) city.drawConnection(prev, g2D);
-                prev = city;
+            for (City curr : cluster) {
+                curr.connectNextCity(null);
+                if (prev != null) prev.drawConnection(curr, g2D);
+                prev = curr;
             }
 
-            if (prev != null) prev.drawConnection(cityList.get(0), g2D);
+            if (prev != null && !this.userConnect) prev.drawConnection(cluster.get(0), g2D);
 
-            for (City city : cityList) city.draw(g);
-        }
-
-    }
-
-    private City findCityAround(int x, int y) {
-        for (City city : Blackboard.getInstance().cityList) {
-            if (city.containsPoint(x, y)) {
-                System.out.println("found x=" + x + ", y=" + y + ", inside" + city);
-                return city;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * This method is used to either mark end for drag and drop operation on a city
-     * or create a new city at the selected position.
-     *
-     * @param e The mouse event caught
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-        if (selectedCity != null) {
-            selectedCity.move(e.getX(), e.getY());
-            System.out.println("nulling selectedCity: " + selectedCity);
-            selectedCity = null; //this is a follow up of mouse-released
-            Blackboard.getInstance().dataChanged = true;
-
-        } else {
-            selectedCity = findCityAround(e.getX(), e.getY());
-            if (selectedCity == null) {
-
-                City newCity = takeNewCityInput(e.getX(), e.getY());
-                if (newCity != null) {
-                    Blackboard.getInstance().cityList.add(newCity);
-                    Blackboard.getInstance().dataChanged = true;
-                    System.out.println("added new city"); //TODO
-                }
-
-            }
-
+            for (City city : cluster) city.draw(g);
         }
 
     }
@@ -206,6 +217,14 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
                     getColor((String) Objects.requireNonNull(hollowPlusShapeColor.getSelectedItem())),
             };
 
+
+            for (City city : Blackboard.getInstance().cityList) {
+                if (city.label.equals(cityName.getText())) {
+                    String errorMsg = "City already exists."; //TODO
+                    return null;
+                }
+            }
+
             return createNewCityFromInput(x, y, cityName.getText(), citySize.getText(), shapes, colorsSelected);
 
         }
@@ -223,13 +242,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         if (name == null) {
             errorMsg = "Please enter a name for the city.";
             return null;
-        }
-
-        for (City city : Blackboard.getInstance().cityList) {
-            if (city.label.equals(name)) {
-                errorMsg = "City already exists.";
-                return null;
-            }
         }
 
         int size;
@@ -294,6 +306,45 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         return retVal;
     }
 
+    private City findCityContaining(int x, int y) {
+        for (City city : Blackboard.getInstance().cityList) {
+            if (city.containsPoint(x, y)) {
+                System.out.println("found x=" + x + ", y=" + y + ", inside" + city);
+                return city;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * This method is used to either mark end for drag and drop operation on a city
+     * or create a new city at the selected position.
+     *
+     * @param e The mouse event caught
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        System.out.println("mouseClicked");
+
+        if (!userConnect) return;
+
+        if (this.canCreateCities) {
+            selectedCity = findCityContaining(e.getX(), e.getY());
+
+            if (selectedCity == null) {
+                City newCity = takeNewCityInput(e.getX(), e.getY());
+                if (newCity != null) {
+                    Blackboard.getInstance().cityList.add(newCity);
+                    Blackboard.getInstance().dataChanged = true;
+                    System.out.println("added new city"); //TODO
+                }
+
+            }
+
+        }
+
+    }
+
     /**
      * This method is used to mark the start for drag and drop operation on a city, if found
      *
@@ -301,7 +352,23 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        selectedCity = findCityAround(e.getX(), e.getY());
+        System.out.println("mousePressed");
+        selectedCity = findCityContaining(e.getX(), e.getY());
+    }
+
+    /**
+     * This method is used to make sure the city is being drawn as it is being dragged
+     *
+     * @param e The mouse event caught
+     */
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        System.out.println("mouseDragged");
+        if (selectedCity != null && this.canMoveCities) {
+            selectedCity.move(e.getX(), e.getY());
+            Blackboard.getInstance().dataChanged = true;
+        }
+
     }
 
     /**
@@ -311,10 +378,20 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        System.out.println("mouseReleased");
         if (selectedCity != null) {
-            selectedCity.move(e.getX(), e.getY());
+            if (this.canMoveCities) {
+                selectedCity.move(e.getX(), e.getY());
+            } else {
+                City nextCity = findCityContaining(e.getX(), e.getY());
+                if (nextCity != null) {
+                    Blackboard.getInstance().connectTwoCities(selectedCity, nextCity);
+                }
+            }
+
             Blackboard.getInstance().dataChanged = true;
+            System.out.println("nulling selectedCity: " + selectedCity);
+            selectedCity = null; //this is a follow up of mouse-released
         }
 
     }
@@ -326,21 +403,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     @Override
     public void mouseExited(MouseEvent e) {
-
-    }
-
-    /**
-     * This method is used to make sure the city is being drawn as it is being dragged
-     *
-     * @param e The mouse event caught
-     */
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-        if (selectedCity != null) {
-            selectedCity.move(e.getX(), e.getY());
-            Blackboard.getInstance().dataChanged = true;
-        }
 
     }
 
@@ -364,3 +426,28 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 }
+
+/*
+
+
+//        if (selectedCity != null) {
+//            selectedCity.move(e.getX(), e.getY());
+//            System.out.println("nulling selectedCity: " + selectedCity);
+//            selectedCity = null; //this is a follow up of mouse-released
+//            Blackboard.getInstance().dataChanged = true;
+//
+//        } else {
+//            selectedCity = findCityAround(e.getX(), e.getY());
+//            if (selectedCity == null) {
+//
+//                City newCity = takeNewCityInput(e.getX(), e.getY());
+//                if (newCity != null) {
+//                    Blackboard.getInstance().cityList.add(newCity);
+//                    Blackboard.getInstance().dataChanged = true;
+//                    System.out.println("added new city"); //TODO
+//                }
+//
+//            }
+//
+//        }
+ */

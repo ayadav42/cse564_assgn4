@@ -19,6 +19,7 @@ public class City {
     public Rectangle bounds;
     public String label;
     ShapeComponent cityShape;
+    City nextCity;
 
     /**
      * Creates an instance of model.City
@@ -83,7 +84,12 @@ public class City {
      * @param g2D   The Graphics2D instance
      */
     public void drawConnection(City other, Graphics2D g2D) {
+        connectNextCity(other);
         g2D.drawLine(center().x, center().y, other.center().x, other.center().y);
+    }
+
+    public void connectNextCity(City nextCity) {
+        this.nextCity = nextCity;
     }
 
     /**

@@ -21,7 +21,7 @@ public class Blackboard {
     public List<List<City>> path;
     public boolean dataChanged;
 
-    private Blackboard(){
+    private Blackboard() {
 
         this.cityList = new ArrayList<>();
         this.path = new ArrayList<>();
@@ -31,11 +31,133 @@ public class Blackboard {
 
     /**
      * This method fetches the only instance of blackboard.
-     *
      */
-    public static Blackboard getInstance(){
-        if(_instance == null) _instance = new Blackboard();
+    public static Blackboard getInstance() {
+        if (_instance == null) _instance = new Blackboard();
         return _instance;
+    }
+
+    public void printCities() {
+        System.out.println("\nPrinting all cities");
+        System.out.println(this.cityList);
+        System.out.println("---------------------");
+    }
+
+    public void printClusters() {
+        System.out.println("\nPrinting clusters");
+        for (List<City> cluster : this.path) {
+            System.out.println(cluster);
+        }
+        System.out.println("---------------------");
+    }
+
+    public City findCityInPath(City city) {
+        for (List<City> cluster : path) {
+            for (City existingCity : cluster) {
+                if (existingCity.equals(city)) {
+                    return city;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<City> getCluster(City city) {
+        for (List<City> cluster : path) {
+            for (City existingCity : cluster) {
+                if (existingCity.equals(city)) {
+                    return cluster;
+                }
+            }
+        }
+        return null;
+    }
+
+    /*
+
+    City0 - curr
+    $$
+    City1
+    $$
+    City2 - other
+    $$
+    City3
+    $$
+
+
+     * City0
+     * City1 - other
+     * City2
+     * $$
+     * City3
+     * City4 - curr
+     * $$
+     * City5
+     * City6
+     *
+     * City0
+     * $$
+     * City3
+     * City4 - curr
+     * City1 - other
+     * City2
+     * $$
+     * City5
+     * City6
+     */
+
+    public City getPrevCity(City city) {
+        for (List<City> cluster : path) {
+            for (City existingCity : cluster) {
+                if (existingCity.nextCity != null && existingCity.nextCity.equals(city)) {
+                    return existingCity;
+                }
+            }
+        }
+        return null;
+    }
+
+    public int getClusterIndex(City city) {
+        int index = 0;
+        for (List<City> cluster : path) {
+            for (City existingCity : cluster) {
+                if (existingCity.equals(city)) {
+                    return index;
+                }
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    public void connectTwoCities(City currCity, City otherCity) {
+
+        if (currCity.nextCity != null) return;
+
+        City prevOfOtherCity = getPrevCity(otherCity);
+        if (prevOfOtherCity != null) return;
+
+        int currCityClusterIndex = getClusterIndex(currCity);
+        List<City> currCityCluster = path.get(currCityClusterIndex);
+
+        int otherCityClusterIndex = getClusterIndex(otherCity);
+        List<City> otherCityCluster = path.get(otherCityClusterIndex);
+
+        if (currCityClusterIndex == otherCityClusterIndex) {
+            return;
+        }
+
+        int otherCityIndex = otherCityCluster.indexOf(otherCity);
+        List<City> otherCityNewCluster = new ArrayList<>();
+        for(int i = otherCityCluster.size() - 1; i >= otherCityIndex; i--){
+            otherCityNewCluster.add(otherCityCluster.remove(otherCityCluster.size() - 1));
+        }
+        if(otherCityCluster.size() == 0) path.remove(otherCityClusterIndex);
+        currCity.connectNextCity(otherCity);
+        int currCityIndex = currCityCluster.indexOf(currCity);
+        currCityCluster.addAll(currCityIndex, otherCityNewCluster);
+
+        this.dataChanged = true;
     }
 
 }

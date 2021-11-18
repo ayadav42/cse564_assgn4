@@ -118,32 +118,3 @@ public class TSPPro extends TSPAlgorithm {
     }
 
 }
-
-
-/**
- * Updates the city that has been moved with the new coordinates
- *
- * @param cityClicked the city that needs to update
- * @param x           contains the x coordinate
- * @param y           contains the y coordinate
- */
-    /*
-    public void updateCities(City cityClicked, int x, int y) {
-        if (cityClicked != null) {
-            tspRoute.cities.stream().map(n -> {
-                if (n.name.equals(cityClicked.label + "")) {
-                    System.out.println("inside");
-                    n.latitude = x * Math.PI / 180D;
-                    n.longitude = y * Math.PI / 180D;
-                }
-                return n;
-            }).collect(Collectors.toList());
-            System.out.println();
-            System.out.println("Printing updated route");
-            tspRoute.cities.forEach(n -> {
-                        System.out.print(n.name + " ");
-                    }
-            );
-        }
-    }
-    */
