@@ -1,5 +1,6 @@
 package view;
 
+import controller.Logger;
 import model.cityshapes.*;
 import model.Blackboard;
 import model.City;
@@ -17,7 +18,7 @@ import java.util.List;
  * notified when the path is ready.
  *
  * @author amaryadav
- * @author kaichen
+ * @author navya
  * @version 1.0
  * @since 2021-10-08
  */
@@ -72,21 +73,21 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
     }
 
     public void enableMove() {
-        System.out.println("moving cities enabled");
+        Logger.getInstance().log("Moving cities enabled");
         this.canMoveCities = true;
         this.canConnectCities = false;
         this.canCreateCities = false;
     }
 
     public void enableConnect() {
-        System.out.println("connecting cities enabled");
+        Logger.getInstance().log("Connecting cities enabled");
         this.canMoveCities = false;
         this.canConnectCities = true;
         this.canCreateCities = false;
     }
 
     public void enableCreateNewCity() {
-        System.out.println("creating cities enabled");
+        Logger.getInstance().log("Creating cities enabled");
         this.canMoveCities = false;
         this.canConnectCities = false;
         this.canCreateCities = true;
@@ -117,8 +118,9 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     public String getCitiesInTxtFriendlyFormat() {
 
+        Logger.getInstance().log("Converting cities to storage friendly text format.");
+
         String[] cities = new String[Blackboard.getInstance().cityList.size() + Blackboard.getInstance().path.size()];
-        System.out.println("getCitiesInTxtFriendlyFormat cities.size=" + cities.length);
         int index = 0;
 
         for (List<City> cluster : Blackboard.getInstance().path) {
@@ -147,7 +149,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         g2D.setColor(Color.BLUE);
 
         for (List<City> cluster : Blackboard.getInstance().path) {
-            System.out.println("painting cities=" + cluster.size());
             City prev = null;
 
             for (City curr : cluster) {
@@ -220,7 +221,7 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
             for (City city : Blackboard.getInstance().cityList) {
                 if (city.label.equals(cityName.getText())) {
-                    String errorMsg = "City already exists."; //TODO
+                    Logger.getInstance().log("City already exists.");
                     return null;
                 }
             }
@@ -229,18 +230,19 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
         }
 
-        String errorMsg = "Cancelled"; //TODO
-        System.out.println("Cancelled");
+        String errorMsg = "Cancelled";
+        Logger.getInstance().log(errorMsg);
         return null;
 
     }
 
     public City createNewCityFromInput(int x, int y, String name, String citySize, boolean[] shapes, Color[] colors) {
 
-        String errorMsg = null; //TODO
+        String errorMsg = null;
 
         if (name == null) {
             errorMsg = "Please enter a name for the city.";
+            Logger.getInstance().log(errorMsg);
             return null;
         }
 
@@ -249,13 +251,16 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
             size = Integer.parseInt(citySize);
             if (size < City.minSize) {
                 errorMsg = "Please enter a minimum size of " + City.minSize + ".";
+                Logger.getInstance().log(errorMsg);
                 return null;
             } else if (size > City.maxSize) {
                 errorMsg = "Please enter a size less than " + City.maxSize + ".";
+                Logger.getInstance().log(errorMsg);
                 return null;
             }
         } catch (NumberFormatException e) {
             errorMsg = "Please enter an integer for city size.";
+            Logger.getInstance().log(errorMsg);
             return null;
         }
 
@@ -307,12 +312,13 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
     }
 
     private City findCityContaining(int x, int y) {
+
         for (City city : Blackboard.getInstance().cityList) {
             if (city.containsPoint(x, y)) {
-                System.out.println("found x=" + x + ", y=" + y + ", inside" + city);
                 return city;
             }
         }
+
         return null;
     }
 
@@ -324,7 +330,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("mouseClicked");
 
         if (!userConnect) return;
 
@@ -336,7 +341,7 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
                 if (newCity != null) {
                     Blackboard.getInstance().cityList.add(newCity);
                     Blackboard.getInstance().dataChanged = true;
-                    System.out.println("added new city"); //TODO
+                    Logger.getInstance().log("Added new city at x=" + e.getX() + ", y=" + e.getY());
                 }
 
             }
@@ -352,7 +357,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("mousePressed");
         selectedCity = findCityContaining(e.getX(), e.getY());
     }
 
@@ -363,7 +367,7 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mouseDragged(MouseEvent e) {
-        System.out.println("mouseDragged");
+
         if (selectedCity != null && this.canMoveCities) {
             selectedCity.move(e.getX(), e.getY());
             Blackboard.getInstance().dataChanged = true;
@@ -378,11 +382,11 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("mouseReleased");
+
         if (selectedCity != null) {
             if (this.canMoveCities) {
                 selectedCity.move(e.getX(), e.getY());
-            } else {
+            } else { //this.canConnectCities
                 City nextCity = findCityContaining(e.getX(), e.getY());
                 if (nextCity != null) {
                     Blackboard.getInstance().connectTwoCities(selectedCity, nextCity);
@@ -390,7 +394,6 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
             }
 
             Blackboard.getInstance().dataChanged = true;
-            System.out.println("nulling selectedCity: " + selectedCity);
             selectedCity = null; //this is a follow up of mouse-released
         }
 
@@ -412,7 +415,7 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
     }
 
     /**
-     * This method is run when controller.tsp.TSPNearestNbr notifies that the path is ready
+     * This method is run when a TSPAlgorithm notifies that the path is ready
      * to be drawn.
      *
      * @param o   The Observable controller.tsp.TSPNearestNbr object
@@ -421,33 +424,7 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
     @Override
     public void update(Observable o, Object arg) {
 
-        System.out.println("notified by controller.tsp.TSPAlgorithm, proceeding to repaint");
         repaint();
 
     }
 }
-
-/*
-
-
-//        if (selectedCity != null) {
-//            selectedCity.move(e.getX(), e.getY());
-//            System.out.println("nulling selectedCity: " + selectedCity);
-//            selectedCity = null; //this is a follow up of mouse-released
-//            Blackboard.getInstance().dataChanged = true;
-//
-//        } else {
-//            selectedCity = findCityAround(e.getX(), e.getY());
-//            if (selectedCity == null) {
-//
-//                City newCity = takeNewCityInput(e.getX(), e.getY());
-//                if (newCity != null) {
-//                    Blackboard.getInstance().cityList.add(newCity);
-//                    Blackboard.getInstance().dataChanged = true;
-//                    System.out.println("added new city"); //TODO
-//                }
-//
-//            }
-//
-//        }
- */

@@ -2,6 +2,13 @@ package model.cityshapes;
 
 import java.awt.*;
 
+/**
+ * This class represents the square shaped component of a city's shape.
+ *
+ * @author Amar Yadav (ID: 1219650510, ayadav42@asu.edu)
+ * @version 1.0
+ * @since 2021-11-15
+ */
 public class Square extends ShapeDecorator {
 
     int x;
@@ -9,6 +16,14 @@ public class Square extends ShapeDecorator {
     Rectangle bounds;
     int size;
 
+    /**
+     * Creates a square shaped component for the city.
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param size size of the circle
+     * @param color color of the circle
+     */
     public Square(int x, int y, int size, Color color) {
 
         this.size = size;
@@ -18,6 +33,12 @@ public class Square extends ShapeDecorator {
 
     }
 
+    /**
+     * Used to move this square shape component to new coordinates.
+     *
+     * @param x new x coordinate
+     * @param y new y coordinate
+     */
     @Override
     public void moveTo(int x, int y) {
 
@@ -29,12 +50,23 @@ public class Square extends ShapeDecorator {
 
     }
 
+    /**
+     * Used to check if the point lies inside
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return boolean true if found
+     */
     @Override
     public boolean containsPoint(int x, int y) {
-        System.out.println("checking inside single box if x=" + x + ", y=" + y + " is inside of bounds=" + this.bounds + ", ans : " + this.bounds.contains(x, y));
         return super.containsPoint(x, y) || this.bounds.contains(x, y);
     }
 
+    /**
+     * Draws the square shape
+     *
+     * @param g The graphics passed
+     */
     @Override
     public void draw(Graphics g) {
 
@@ -44,6 +76,11 @@ public class Square extends ShapeDecorator {
 
     }
 
+    /**
+     * Helps convert the shape to a storage friendly format
+     *
+     * @param arr The array for setting color value at
+     */
     @Override
     public void toStorageFormat(String[] arr) {
         super.toStorageFormat(arr);

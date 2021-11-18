@@ -8,8 +8,7 @@ import java.util.List;
  * cities in the order of shortest traversal. It also maintains a flag
  * to mark change in city data.
  *
- * @author amaryadav
- * @author kaichen
+ * @author amaryadav, greeshma
  * @version 1.0
  * @since 2021-10-08
  */
@@ -73,39 +72,6 @@ public class Blackboard {
         return null;
     }
 
-    /*
-
-    City0 - curr
-    $$
-    City1
-    $$
-    City2 - other
-    $$
-    City3
-    $$
-
-
-     * City0
-     * City1 - other
-     * City2
-     * $$
-     * City3
-     * City4 - curr
-     * $$
-     * City5
-     * City6
-     *
-     * City0
-     * $$
-     * City3
-     * City4 - curr
-     * City1 - other
-     * City2
-     * $$
-     * City5
-     * City6
-     */
-
     public City getPrevCity(City city) {
         for (List<City> cluster : path) {
             for (City existingCity : cluster) {
@@ -135,7 +101,9 @@ public class Blackboard {
         if (currCity.nextCity != null) return;
 
         City prevOfOtherCity = getPrevCity(otherCity);
-        if (prevOfOtherCity != null) return;
+        if (prevOfOtherCity != null) {
+            return;
+        }
 
         int currCityClusterIndex = getClusterIndex(currCity);
         List<City> currCityCluster = path.get(currCityClusterIndex);
@@ -149,13 +117,15 @@ public class Blackboard {
 
         int otherCityIndex = otherCityCluster.indexOf(otherCity);
         List<City> otherCityNewCluster = new ArrayList<>();
-        for(int i = otherCityCluster.size() - 1; i >= otherCityIndex; i--){
+        for (int i = otherCityCluster.size() - 1; i >= otherCityIndex; i--) {
             otherCityNewCluster.add(otherCityCluster.remove(otherCityCluster.size() - 1));
         }
-        if(otherCityCluster.size() == 0) path.remove(otherCityClusterIndex);
+        if (otherCityCluster.size() == 0) path.remove(otherCityClusterIndex);
         currCity.connectNextCity(otherCity);
         int currCityIndex = currCityCluster.indexOf(currCity);
         currCityCluster.addAll(currCityIndex, otherCityNewCluster);
+
+        printClusters();
 
         this.dataChanged = true;
     }

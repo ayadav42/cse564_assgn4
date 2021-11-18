@@ -6,6 +6,15 @@ import model.City;
 import java.util.List;
 import java.util.Observable;
 
+/**
+ * This abstract class serves as the base algorithm for all the TSP algorithms.
+ * Each child of the class must implement the method calculate. After they are
+ * done calculating, they notify their observers.
+ *
+ * @author Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 1.0
+ * @since 2021-11-16
+ */
 public abstract class TSPAlgorithm extends Observable implements Runnable {
 
     public boolean keepRunning = true;
@@ -21,18 +30,22 @@ public abstract class TSPAlgorithm extends Observable implements Runnable {
         this.type = type;
     }
 
+    /**
+     * Each child of this class implements this method.
+     *
+     * @param cityList The list of cities to calculate the path for
+     */
     public abstract void calculate(List<City> cityList);
 
     /**
-     * This method helps controller.tsp.TSPNearestNbr scan for data changes in the list of cities
-     * and calculate the new path if needed.
+     * This method ensures that the TSP Algorithm keeps calculating the latest path
+     * until asked to stop.
      */
     public void run() {
         while (this.keepRunning) {
             try {
                 Thread.sleep(1); //without this code won't work, need to ask prof. why
                 if (Blackboard.getInstance().dataChanged) {
-                    System.out.println("dataChanged=" + Blackboard.getInstance().dataChanged);
                     this.calculate(Blackboard.getInstance().cityList);
                     Blackboard.getInstance().dataChanged = false;
                 }

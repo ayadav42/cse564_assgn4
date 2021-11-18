@@ -1,5 +1,6 @@
 package controller.tsp;
 
+import controller.Logger;
 import model.Blackboard;
 import model.City;
 import view.App;
@@ -10,8 +11,9 @@ import java.util.*;
  * This class runs the travelling sales person algorithm to find the optimal route between the points.
  * It uses the Simulated Annealing Algorithm.
  *
- * @author : Ishanu Dhar (ID: 1222326326, idhar@asu.edu)
- * @author : Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @author Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 1.0
+ * @since 2021-11-16
  */
 public class TSPCluster extends TSPAlgorithm {
 
@@ -28,15 +30,21 @@ public class TSPCluster extends TSPAlgorithm {
         this.keepRunning = true;
     }
 
+    /**
+     * Implementation of the 'calculate' method inherited.
+     *
+     * @param cityList The list of cities to calculate the path for
+     */
     @Override
     public void calculate(List<City> cityList) {
 
-        System.out.println("TSPCluster calculate");
+        Logger.getInstance().log("Calculating shortest path using TSP Cluster");
 
         List<List<City>> path = new ArrayList<>();
 
         if (cityList.isEmpty()) {
             Blackboard.getInstance().path = path;
+            Logger.getInstance().log("Path updated.");
             setChanged();
             notifyObservers();
             return;
@@ -49,7 +57,6 @@ public class TSPCluster extends TSPAlgorithm {
         tspClusterList.add(new ArrayList<>());
 
         cityList.forEach(city -> {
-            System.out.println("city="+city);
             if (city.bounds.x < App.workspaceWidth / 2 && city.bounds.y > App.workspaceHeight / 2) {
                 tspClusterList.get(0).add(new TSPCity(city, city.bounds.x, city.bounds.y));
             } else if (city.bounds.x > App.workspaceWidth / 2 && city.bounds.y > App.workspaceHeight / 2) {
@@ -62,14 +69,14 @@ public class TSPCluster extends TSPAlgorithm {
         });
 
         calculateRoute(path, tspClusterList);
-        System.out.println(path);
         Blackboard.getInstance().path = path;
+        Logger.getInstance().log("Path updated.");
         setChanged();
         notifyObservers();
 
     }
 
-    public void calculateRoute(List<List<City>> path, List<List<TSPCity>> tspClusterList) {
+    private void calculateRoute(List<List<City>> path, List<List<TSPCity>> tspClusterList) {
 
         for (List<TSPCity> tspCities : tspClusterList) {
             tspRoute = new TSPRoute(new ArrayList<>());
@@ -85,27 +92,18 @@ public class TSPCluster extends TSPAlgorithm {
 
     }
 
+    private void findRoute() {
 
-    /**
-     * This method  calculates the TSPNearestNbr and fetches the shortest route
-     */
-    public void findRoute() {
-
-        System.out.println("Find route called");
         shortestRoute = createTspRoute(tspRoute);
 
         if (tspRoute.cities.size() <= 1) return;
 
-        System.out.println("cities are greater than 1");
-
         TSPRoute adjacentRoute;
         int initialTemperature = 999;
+
         while (initialTemperature > TSPAlgorithm.TEMP_MIN) {
-            System.out.println("herre1");
             TSPRoute route = createTspRoute(tspRoute);
-            System.out.println("herre2 route.size="+route.cities.size());
             adjacentRoute = obtainAdjacentRoute(route);
-            System.out.println("herre3");
             if (tspRoute.getTotalDistance() < shortestRoute.getTotalDistance()) {
                 shortestRoute = createTspRoute(tspRoute);
             }
@@ -113,13 +111,7 @@ public class TSPCluster extends TSPAlgorithm {
                 tspRoute = createTspRoute(adjacentRoute);
             }
             initialTemperature *= 1 - TSPAlgorithm.COOLING_RATE;
-            System.out.println("herre4");
         }
-
-        System.out.println("Printing the route");
-        shortestRoute.cities.forEach(tspCity -> {
-            System.out.print(tspCity.city.label + " ");
-        });
 
     }
 

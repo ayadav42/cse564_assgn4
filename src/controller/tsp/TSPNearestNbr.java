@@ -1,5 +1,6 @@
 package controller.tsp;
 
+import controller.Logger;
 import model.Blackboard;
 import model.City;
 
@@ -8,12 +9,12 @@ import java.util.List;
 
 /**
  * This class is responsible for calculating the shortest hamiltonian path
- * for visiting all cities. It is also an observable that notifies observers
- * when it's done calculating. It runs on it's own thread.
+ * for visiting all cities using Nearest Neighbor. It is also an observable
+ * that notifies observers when it's done calculating. It runs on it's own thread.
  *
- * @author amaryadav
- * @author kaichen
- * @version 1.0
+ * @author Amar Yadav (ID: 1219650510, ayadav42@asu.edu)
+ * @author Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 2.0
  * @since 2021-10-08
  */
 public class TSPNearestNbr extends TSPAlgorithm {
@@ -21,21 +22,29 @@ public class TSPNearestNbr extends TSPAlgorithm {
     public static final String name = "TSP - Nearest Neighbor";
 
     /**
-     * Creates an instance of controller.tsp.TSPNearestNbr class initialized
-     * to keep running when requested.
+     * Creates an instance of TSPNearestNbr class initialized
+     * to keep running until requested to stop.
      */
     public TSPNearestNbr() {
         super(TSPTypes.TSP_NEAREST_NBR);
         this.keepRunning = true;
     }
 
+    /**
+     * Implementation of the 'calculate' method inherited.
+     *
+     * @param cityList The list of cities to calculate the path for
+     */
     @Override
     public void calculate(List<City> cityList) { //reorder the cities
+
+        Logger.getInstance().log("Calculating shortest path using TSP Nearest Neighbor");
 
         List<List<City>> path = new ArrayList<>();
 
         if (cityList.isEmpty()) {
             Blackboard.getInstance().path = path;
+            Logger.getInstance().log("Path updated.");
             setChanged();
             notifyObservers();
             return;
@@ -80,6 +89,7 @@ public class TSPNearestNbr extends TSPAlgorithm {
 
         path.add(connections);
         Blackboard.getInstance().path = path;
+        Logger.getInstance().log("Path updated.");
         setChanged();
         notifyObservers();
 

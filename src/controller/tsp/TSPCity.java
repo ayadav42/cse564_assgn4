@@ -3,7 +3,12 @@ package controller.tsp;
 import model.City;
 
 /**
- * This class provides the city model on which the TSPNearestNbr algorithm needs to run
+ * This class wraps an existing the city to add functionalities used
+ * by some TSP Algorithms
+ *
+ * @author Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 1.0
+ * @since 2021-11-16
  */
 public class TSPCity {
 

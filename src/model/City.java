@@ -5,10 +5,9 @@ import model.cityshapes.ShapeComponent;
 import java.awt.*;
 
 /**
- * This class is used to define a city using a number and its coordinates.
+ * This class is used to define a city using a label, its coordinates and shape.
  *
- * @author amaryadav
- * @author kaichen
+ * @author Amar Yadav (ID: 1219650510, ayadav42@asu.edu)
  * @version 1.0
  * @since 2021-10-06
  */
@@ -27,6 +26,8 @@ public class City {
      * @param label The city's name set by user
      * @param x     The city's x-coordinate
      * @param y     The city's y-coordinate
+     * @param cityShape The shape of the city
+     * @param size size of the city
      */
     public City(String label, int x, int y, ShapeComponent cityShape, int size) {
 
@@ -37,7 +38,7 @@ public class City {
     }
 
     /**
-     * Draws the city as a bounded rectangle.
+     * Draws the city using the stored shape component.
      *
      * @param g The graphics instance passed by caller
      */
@@ -73,6 +74,13 @@ public class City {
         return new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     }
 
+    /**
+     * To check if the city contains a point
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return true if found
+     */
     public boolean containsPoint(int x, int y) {
         return this.cityShape.containsPoint(x, y);
     }
@@ -88,6 +96,12 @@ public class City {
         g2D.drawLine(center().x, center().y, other.center().x, other.center().y);
     }
 
+    /**
+     * To connect to next city in path.
+     * This helps with TSP User connect algorithm
+     *
+     * @param nextCity the next city
+     */
     public void connectNextCity(City nextCity) {
         this.nextCity = nextCity;
     }
@@ -99,19 +113,23 @@ public class City {
      */
     @Override
     public String toString() {
+        String retVal = "City{" +
+                "bounds=" + bounds +
+                ", label='" + label + '\'' +
+                ", cityShape=" + cityShape;
 
-        return "model.City{" +
-                "label=" + label +
-                ", x=" + bounds.x +
-                ", y=" + bounds.y +
-                '}';
+        if (this.nextCity != null) {
+            retVal += (", nextCity=" + nextCity.label);
+        }
 
+        retVal += "}";
+        return retVal;
     }
 
     /**
      * Used for conveniently converting a city to text-friendly format.
      *
-     * @return String Contains city's name and location.
+     * @return String Contains city's name, location and shape.
      */
     public String toStorageFormat() {
 

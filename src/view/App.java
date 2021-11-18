@@ -1,8 +1,10 @@
 package view;
 
+import controller.Logger;
 import model.Blackboard;
 import model.City;
 import controller.tsp.*;
+import sun.rmi.runtime.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +24,7 @@ import java.util.Arrays;
  * The main method inside this class shows a window to the user.
  *
  * @author amaryadav
- * @author kaichen
+ * @author navya
  * @version 1.0
  * @since 2021-10-08
  */
@@ -35,6 +37,7 @@ public class App extends JFrame implements ActionListener {
     private final JMenu actionMenu;
     private TSPAlgorithm tspAlgorithm;
     private Thread tspThread;
+    public static JLabel status;
 
     /**
      * Creates an instance of the app with a menu bar and one panel inside.
@@ -110,6 +113,10 @@ public class App extends JFrame implements ActionListener {
         add(workspace, BorderLayout.CENTER);
         workspace.setVisible(true);
 
+        status = new JLabel();
+        status.setSize(workspaceWidth, 100);
+        add(status, BorderLayout.SOUTH);
+
         setTspAlgorithm(TSPNearestNbr.name);
 
     }
@@ -174,7 +181,6 @@ public class App extends JFrame implements ActionListener {
                 tspAlgorithm = new TSPUserConnect();
         }
 
-        System.out.println("Setting tspAlgorithm=" + name + ", type=" + tspAlgorithm.type);
         setTspAlgorithm(tspAlgorithm);
 
     }
@@ -182,17 +188,15 @@ public class App extends JFrame implements ActionListener {
     private void setTspAlgorithm(TSPAlgorithm tspAlgorithm) {
 
         if (this.tspThread != null && !this.tspThread.isInterrupted()) {
-            System.out.println("stopping this.tspThread");
             this.tspThread.stop();
         }
 
         if (this.tspAlgorithm != null) {
-            System.out.println("this.tspAlgorithm not null=" + getTspName(this.tspAlgorithm));
             this.tspAlgorithm.deleteObserver(this.workspace);
         }
 
-        this.tspAlgorithm = tspAlgorithm; //null in case of "User Connect"
-        System.out.println("setting new this.tspAlgorithm type=" + this.tspAlgorithm.type + ", name=" + getTspName(this.tspAlgorithm));
+        this.tspAlgorithm = tspAlgorithm;
+        Logger.getInstance().log("Setting the new TSPAlgorithm type=" + this.tspAlgorithm.type + ", name=" + getTspName(this.tspAlgorithm));
         this.tspAlgorithm.addObserver(workspace);
         this.tspThread = new Thread(tspAlgorithm); //Polling for resources, NIO.2
         this.tspThread.start();
@@ -201,12 +205,12 @@ public class App extends JFrame implements ActionListener {
         if (this.tspAlgorithm.type == TSPTypes.USER_CONNECT) {
 
             if (this.actionMenu.isEnabled()) {
-                System.out.println("action menu was enabled, disabling action menu and enabling connections menu");
+                Logger.getInstance().log("Action menu was enabled, disabling Action menu and enabling Connections menu");
                 disableUserConnect();
                 enableTSPConnectionMenuItems();
 
             } else {
-                System.out.println("action menu was disabled, enabling action menu and disabling connections menu");
+                Logger.getInstance().log("Action menu was disabled, enabling Action menu and disabling Connections menu");
                 enableUserConnect();
                 disableTSPConnectionMenuItems();
 
@@ -299,7 +303,7 @@ public class App extends JFrame implements ActionListener {
         FileDialog fd = new FileDialog(this, "Choose a file", FileDialog.LOAD);
         fd.setVisible(true);
         String filepath = fd.getDirectory() + fd.getFile();
-        System.out.println("You chose " + filepath);
+        Logger.getInstance().log("You chose " + filepath);
         return filepath;
 
     }
@@ -328,9 +332,10 @@ public class App extends JFrame implements ActionListener {
             return;
         }
 
+        Logger.getInstance().log("Reading txt file: " + filepath);
+
         List<City> cities = new ArrayList<>();
         List<List<City>> path = new ArrayList<>();
-        System.out.println("reading txt file: " + filepath);
         BufferedReader br = new BufferedReader(new FileReader(filepath));
 
         String tspAlgo = br.readLine(); //first line contains the algo
@@ -344,7 +349,6 @@ public class App extends JFrame implements ActionListener {
 
             while (!line.equals("$$")) {
                 String[] arr = line.split(",");
-                System.out.println("city arr: " + Arrays.toString(arr));
                 String cityName = arr[0];
                 int x = Integer.parseInt(arr[1]);
                 int y = Integer.parseInt(arr[2]);
@@ -366,7 +370,6 @@ public class App extends JFrame implements ActionListener {
                 }
 
                 City newCity = this.workspace.createNewCityFromInput(x, y, cityName, size, shapes, colors);
-                System.out.println("newCity="+newCity);
                 cities.add(newCity);
                 cluster.add(newCity);
                 noOfCities++;
@@ -374,17 +377,13 @@ public class App extends JFrame implements ActionListener {
                 line = br.readLine();
             }
 
-            System.out.println("cluster read: "+cluster);
             path.add(cluster);
 
             line = br.readLine();
         }
 
         br.close();
-        System.out.println("\nRead file with " + noOfCities + " cities. Path=");
-        for(List<City> cluster : path){
-            System.out.println("cluster="+cluster);
-        }
+        Logger.getInstance().log("Read file with \" + noOfCities + \" cities.");
 
         Blackboard.getInstance().path = path;
         workspace.updateCityList(cities);
@@ -411,7 +410,7 @@ public class App extends JFrame implements ActionListener {
         FileWriter myWriter = new FileWriter(filename + ".txt");
         myWriter.write(data);
         myWriter.close();
-        System.out.println("Successfully wrote to the file.");
+        Logger.getInstance().log("Successfully wrote to the file.");
 
     }
 

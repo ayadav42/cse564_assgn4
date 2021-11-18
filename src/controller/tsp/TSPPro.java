@@ -1,5 +1,6 @@
 package controller.tsp;
 
+import controller.Logger;
 import model.Blackboard;
 import model.City;
 
@@ -9,8 +10,9 @@ import java.util.*;
  * This class runs the travelling sales person algorithm to find the optimal route between the points.
  * It uses the Simulated Annealing Algorithm.
  *
- * @author : Ishanu Dhar (ID: 1222326326, idhar@asu.edu)
  * @author : Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 1.0
+ * @since 2021-11-16
  */
 public class TSPPro extends TSPAlgorithm {
 
@@ -30,10 +32,14 @@ public class TSPPro extends TSPAlgorithm {
      */
     @Override
     public void calculate(List<City> cityList) {
+
+        Logger.getInstance().log("Calculating shortest path using TSP Pro");
+
         List<List<City>> path = new ArrayList<>();
 
         if (cityList.isEmpty()) {
             Blackboard.getInstance().path = path;
+            Logger.getInstance().log("Path updated.");
             setChanged();
             notifyObservers();
             return;
@@ -54,6 +60,7 @@ public class TSPPro extends TSPAlgorithm {
 
         path.add(connections);
         Blackboard.getInstance().path = path;
+        Logger.getInstance().log("Path updated.");
         setChanged();
         notifyObservers();
 
