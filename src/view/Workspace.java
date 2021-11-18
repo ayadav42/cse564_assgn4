@@ -54,6 +54,9 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 
+    /**
+     * Resets the move, connect and create flags to false.
+     */
     public void resetFlags() {
 
         this.canMoveCities = false;
@@ -62,16 +65,25 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 
+    /**
+     * Enables user connect option for the current user
+     */
     public void enableUserConnect() {
         this.userConnect = true;
         resetFlags();
         enableCreateNewCity();
     }
 
+    /**
+     * Disables user connect option for the current user
+     */
     public void disableUserConnect() {
         this.userConnect = false;
     }
 
+    /**
+     * Enables move feature while disabling connect and create features.
+     */
     public void enableMove() {
         Logger.getInstance().log("Moving cities enabled");
         this.canMoveCities = true;
@@ -79,12 +91,20 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
         this.canCreateCities = false;
     }
 
+    /**
+     * Enables connect city feature while disabling move and create features.
+     */
+
     public void enableConnect() {
         Logger.getInstance().log("Connecting cities enabled");
         this.canMoveCities = false;
         this.canConnectCities = true;
         this.canCreateCities = false;
     }
+
+    /**
+     * Enables the user to create new city while disabling move and connect features.
+     */
 
     public void enableCreateNewCity() {
         Logger.getInstance().log("Creating cities enabled");
@@ -164,6 +184,13 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 
+    /**
+     * Creates new city on mouse click on the interface
+     * @param x Latitude identified by the position on mouse click
+     * @param y Longitude identified by the position on mosue click
+     * @return calls the createNewCity method which creates the city of desired shape, size and color and displays
+     * on the interface
+     */
     public City takeNewCityInput(int x, int y) {
 
         String[] colors = {"Blue", "Cyan", "Red", "Orange", "Yellow", "Gray"};
@@ -236,6 +263,16 @@ public class Workspace extends JPanel implements Observer, MouseListener, MouseM
 
     }
 
+    /**
+     * Creates new city from the interface and display the same
+     * @param x latitude of the city identified by the position where mouse is clicked
+     * @param y longitude of the city identified by the position where mouse is clicked
+     * @param name city name given by user
+     * @param citySize size of the city given by user (must be within 30 and 80)
+     * @param shapes shape of the city chosen by user (available shapes: circle, box, hollow plus the circle or box or both)
+     * @param colors color of the city chosen by user (Red, Blue, Cyan, Orange, Yellow, Gray)
+     * @return creates a city of desired shape, size and color and display the same in the interface
+     */
     public City createNewCityFromInput(int x, int y, String name, String citySize, boolean[] shapes, Color[] colors) {
 
         String errorMsg = null;

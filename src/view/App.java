@@ -219,12 +219,18 @@ public class App extends JFrame implements ActionListener {
 
     }
 
+    /**
+     * Enables TSP Algorithm menu items for the current user
+     */
     public void enableTSPConnectionMenuItems() {
         for (Component connectionMenuItem : this.connectionsMenu.getMenuComponents()) {
             connectionMenuItem.setEnabled(true);
         }
     }
 
+    /**
+     * Disables TSP Algorithm menu items and enables "USer Connect" for the current user
+     */
     public void disableTSPConnectionMenuItems() {
         for (Component connectionMenuItem : this.connectionsMenu.getMenuComponents()) {
             connectionMenuItem.setEnabled(false);
@@ -232,6 +238,9 @@ public class App extends JFrame implements ActionListener {
         this.connectionsMenu.getMenuComponent(3).setEnabled(true);
     }
 
+    /**
+     * Enables User Connect option for the current user
+     */
     public void enableUserConnect() {
 
         this.workspace.enableUserConnect();
@@ -239,6 +248,9 @@ public class App extends JFrame implements ActionListener {
 
     }
 
+    /**
+     * Disables User Connect option for the current user
+     */
     public void disableUserConnect() {
 
         this.workspace.disableUserConnect();
