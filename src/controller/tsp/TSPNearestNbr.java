@@ -1,36 +1,50 @@
+package controller.tsp;
+
+import controller.Logger;
+import model.Blackboard;
+import model.City;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 /**
  * This class is responsible for calculating the shortest hamiltonian path
- * for visiting all cities. It is also an observable that notifies observers
- * when it's done calculating. It runs on it's own thread.
+ * for visiting all cities using Nearest Neighbor. It is also an observable
+ * that notifies observers when it's done calculating. It runs on it's own thread.
  *
- * @author amaryadav
- * @author kaichen
- * @version 1.0
+ * @author Amar Yadav (ID: 1219650510, ayadav42@asu.edu)
+ * @author Pritam De (ID: 1219491988, pritamde@asu.edu)
+ * @version 2.0
  * @since 2021-10-08
  */
-public class TSP extends Observable implements Runnable {
+public class TSPNearestNbr extends TSPAlgorithm {
 
-    public boolean keepRunning;
+    public static final String name = "TSP - Nearest Neighbor";
 
     /**
-     * Creates an instance of TSP class initialized
-     * to keep running when requested.
-     *
+     * Creates an instance of TSPNearestNbr class initialized
+     * to keep running until requested to stop.
      */
-    public TSP() {
+    public TSPNearestNbr() {
+        super(TSPTypes.TSP_NEAREST_NBR);
         this.keepRunning = true;
     }
 
-    private void calculate(List<City> cityList) { //reorder the cities
+    /**
+     * Implementation of the 'calculate' method inherited.
+     *
+     * @param cityList The list of cities to calculate the path for
+     */
+    @Override
+    public void calculate(List<City> cityList) { //reorder the cities
 
-        List<City> path = new ArrayList<>();
+        Logger.getInstance().log("Calculating shortest path using TSP Nearest Neighbor");
+
+        List<List<City>> path = new ArrayList<>();
 
         if (cityList.isEmpty()) {
             Blackboard.getInstance().path = path;
+            Logger.getInstance().log("Path updated.");
             setChanged();
             notifyObservers();
             return;
@@ -51,54 +65,34 @@ public class TSP extends Observable implements Runnable {
             }
         }
 
-
-        path.add(cityList.get(0));
+        List<City> connections = new ArrayList<>();
+        connections.add(cityList.get(0));
         visitedCount++;
         visited[0] = true;
         int prevCityIndex = 0;
 
-        while(visitedCount != cityList.size()){
+        while (visitedCount != cityList.size()) {
             //find next unvisited closest nbr
             int closestNbrIndex = -1;
             int minDistance = Integer.MAX_VALUE;
-            for(int i = 0; i < cityList.size(); i++){
-                if(!visited[i] && distance[prevCityIndex][i] < minDistance){
+            for (int i = 0; i < cityList.size(); i++) {
+                if (!visited[i] && distance[prevCityIndex][i] < minDistance) {
                     minDistance = distance[prevCityIndex][i];
                     closestNbrIndex = i;
                 }
             }
 
-            path.add(cityList.get(closestNbrIndex));
+            connections.add(cityList.get(closestNbrIndex));
             visitedCount++;
             visited[closestNbrIndex] = true;
         }
 
+        path.add(connections);
         Blackboard.getInstance().path = path;
+        Logger.getInstance().log("Path updated.");
         setChanged();
         notifyObservers();
 
     }
 
-    /**
-     * This method helps TSP scan for data changes in the list of cities
-     * and calculate the new path if needed.
-     *
-     */
-    @Override
-    public void run() {
-
-        while (this.keepRunning) {
-            try {
-                Thread.sleep(1); //without this code won't work, need to ask prof. why
-                if (Blackboard.getInstance().dataChanged) {
-                    System.out.println("dataChanged=" + Blackboard.getInstance().dataChanged);
-                    this.calculate(Blackboard.getInstance().cityList);
-                    Blackboard.getInstance().dataChanged = false;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 }
