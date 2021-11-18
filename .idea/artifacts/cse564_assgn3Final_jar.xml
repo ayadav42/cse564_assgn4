@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="cse564_assgn3Final:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/cse564_assgn3Final_jar</output-path>
+    <root id="archive" name="cse564_assgn3Final.jar">
+      <element id="module-output" name="cse564_assgn3Final" />
+    </root>
+  </artifact>
+</component>
